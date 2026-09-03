@@ -1,0 +1,2151 @@
+@import url('https://fonts.googleapis.com/css2?family=Mandali&family=Noto+Sans+Telugu:wght@400;600;700;800&family=Roboto:wght@400;500;700;900&display=swap');
+
+/* =========================================
+   CSS CUSTOM PROPERTIES
+   Design tokens for the premium BTV newsroom theme.
+   Dark navy base with BTV red and blue accents.
+   ========================================= */
+:root {
+  /* Core palette */
+  --page-bg:           #070D24;
+  --page-bg-mid:       #0B1230;
+  --header-bg:         rgba(7, 13, 36, 0.90);
+  --header-text:       #FFFFFF;
+
+  /* Brand */
+  --brand-blue:        #0B1FD8;
+  --brand-blue-mid:    #2563EB;
+  --brand-red:         #E31B23;
+  --brand-red-hover:   #B91C1C;
+
+  /* Glass panel surfaces */
+  --panel-glass:       rgba(255, 255, 255, 0.055);
+  --panel-border:      rgba(255, 255, 255, 0.12);
+  --panel-shadow:      0 20px 60px rgba(0, 0, 0, 0.35);
+
+  /* Sub-panel / card-design surface */
+  --subpanel-glass:    rgba(255, 255, 255, 0.04);
+  --subpanel-border:   rgba(255, 255, 255, 0.09);
+
+  /* Typography */
+  --text-main:         #F8FAFC;
+  --text-secondary:    #94A3B8;
+  --text-muted:        #64748B;
+
+  /* Inputs */
+  --input-bg:          rgba(255, 255, 255, 0.055);
+  --input-border:      rgba(255, 255, 255, 0.14);
+  --input-text:        #F8FAFC;
+  --input-placeholder: rgba(255, 255, 255, 0.40);
+  --input-focus-blue:  #2563EB;
+  --input-focus-glow:  rgba(37, 99, 235, 0.25);
+
+  /* Transitions */
+  --t-fast: 0.2s ease;
+  --t-mid:  0.3s ease;
+}
+
+/* =========================================
+   PAGE BACKGROUND
+   Premium dark navy base with atmospheric
+   radial glow gradients behind all content.
+   ========================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--page-bg);
+  color: var(--text-main);
+  /* Subtle radial glow behind everything */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 15% 10%,  rgba(227, 27, 35,  0.10) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 55% at 85% 8%,   rgba(11, 31, 216, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 45% at 10% 90%,  rgba(37, 99, 235,  0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 75% 50% at 90% 88%,  rgba(185, 28, 28,  0.08) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+}
+
+.dashboard-body {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* =========================================
+   FLOATING BACKGROUND ORBS (AMBIENT GLOW)
+   4 large, blurred gradient orbs that float
+   slowly behind the UI using CSS keyframes.
+   pointer-events: none keeps them non-interactive.
+   ========================================= */
+.ambient-glow-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.45;
+}
+
+/* Orb 1 — BTV Red, top-left */
+.glow-orb-1 {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(227, 27, 35, 0.55) 0%, transparent 70%);
+  top: -120px;
+  left: -140px;
+  animation: floatOrb1 16s ease-in-out infinite alternate;
+}
+
+/* Orb 2 — BTV Navy Blue, top-right */
+.glow-orb-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(11, 31, 216, 0.50) 0%, transparent 70%);
+  top: -160px;
+  right: -180px;
+  animation: floatOrb2 20s ease-in-out infinite alternate;
+}
+
+/* Orb 3 — Royal Blue, bottom-left */
+.glow-orb-3 {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.45) 0%, transparent 70%);
+  bottom: -120px;
+  left: -100px;
+  animation: floatOrb3 18s ease-in-out infinite alternate;
+}
+
+/* Orb 4 — Dark Red, bottom-right */
+.glow-orb-4 {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(185, 28, 28, 0.40) 0%, transparent 70%);
+  bottom: -150px;
+  right: -130px;
+  animation: floatOrb4 22s ease-in-out infinite alternate;
+}
+
+/* Floating keyframes — very subtle movement */
+@keyframes floatOrb1 {
+  from { transform: translate(0px,   0px); }
+  to   { transform: translate(40px,  30px); }
+}
+@keyframes floatOrb2 {
+  from { transform: translate(0px,   0px); }
+  to   { transform: translate(-35px, 40px); }
+}
+@keyframes floatOrb3 {
+  from { transform: translate(0px,   0px); }
+  to   { transform: translate(30px, -35px); }
+}
+@keyframes floatOrb4 {
+  from { transform: translate(0px,   0px); }
+  to   { transform: translate(-40px,-28px); }
+}
+
+/* Disable floating animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .glow-orb { animation: none; }
+}
+
+/* =========================================
+   DASHBOARD HEADER
+   Premium dark glass header with backdrop blur.
+   Keeps the BTV branding clean and crisp.
+   ========================================= */
+.dashboard-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 28px;
+  background: var(--header-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.30);
+  color: var(--header-text);
+}
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-logo {
+  display: block;
+  width: auto;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(227, 27, 35, 0.30));
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-main {
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.04em;
+}
+
+.brand-sub {
+  font-size: 0.60rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-red);
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   NAVIGATION BUTTONS (HEADER)
+   Glass-style transparent nav buttons.
+   ========================================= */
+.nav-link,
+.primary-btn,
+.secondary-btn,
+.download-btn,
+.mini-btn,
+.step-btn,
+.preset-btn,
+.new-card-inline {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: all var(--t-fast);
+}
+
+.nav-link {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--header-text);
+  padding: 9px 16px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.nav-link.danger {
+  background: rgba(227, 27, 35, 0.14);
+  border-color: rgba(227, 27, 35, 0.32);
+}
+
+/* =========================================
+   HEADER PROFILE MENU & DROPDOWN
+   Styles the profile toggle button and dropdown menu
+   containing Reporter Info, My Cards, and Logout.
+   ========================================= */
+.profile-menu-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--header-text);
+  padding: 6px 14px 6px 8px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: all var(--t-fast);
+}
+
+.profile-btn:hover,
+.profile-btn[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.profile-avatar-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0B1FD8, #E31B23);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-avatar-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-btn-label {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-chevron {
+  transition: transform var(--t-fast);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-btn[aria-expanded="true"] .profile-chevron {
+  transform: rotate(180deg);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 270px;
+  background: rgba(10, 18, 50, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(11, 31, 216, 0.12);
+  padding: 16px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-photo-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0B1FD8, #E31B23);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-fallback {
+  color: #FFFFFF;
+  font-size: 1.35rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-name {
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.profile-id-badge,
+.profile-dob-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  width: fit-content;
+}
+
+.profile-id-badge .id-value {
+  color: #F3C74A;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.profile-dob-badge .dob-value {
+  color: #67E8F9;
+  font-weight: 600;
+}
+
+.profile-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.10);
+  margin: 14px 0 10px;
+}
+
+.profile-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #CBD5E1;
+  font-weight: 600;
+  font-size: 0.92rem;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.profile-menu-item:hover,
+.profile-menu-item.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.profile-menu-item.danger {
+  color: #FCA5A5;
+}
+
+.profile-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+}
+
+/* =========================================
+   MAIN LAYOUT
+   Left editor + right live preview columns.
+   Both float above the ambient background.
+   ========================================= */
+.dashboard-main {
+  position: relative;
+  z-index: 2;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 24px 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* =========================================
+   GLASS PANELS (EDITOR + PREVIEW)
+   Premium glassmorphism surface applied to
+   both the editor and preview panels.
+   ========================================= */
+.panel {
+  background: var(--panel-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--panel-border);
+  border-radius: 24px;
+  box-shadow:
+    var(--panel-shadow),
+    0 0 40px rgba(11, 31, 216, 0.07),
+    0 0 60px rgba(227, 27, 35, 0.04);
+}
+
+/* Page-load entrance animation for glass panels */
+.editor-panel {
+  animation: panelEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  padding: 26px;
+}
+
+.preview-panel {
+  animation: panelEntrance 0.80s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+  padding: 24px;
+}
+
+@keyframes panelEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editor-panel,
+  .preview-panel {
+    animation: none;
+  }
+}
+
+/* =========================================
+   PANEL HEADERS
+   Section headings with red accent underline
+   and premium typography.
+   ========================================= */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: #FFFFFF;
+  font-size: 1.30rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  position: relative;
+  padding-left: 14px;
+}
+
+/* Red accent bar left of heading */
+.panel-header h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(180deg, var(--brand-red), rgba(227, 27, 35, 0.40));
+  border-radius: 2px;
+}
+
+.subheader h3,
+.download-box h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* =========================================
+   FIELD BLOCKS & SPACING
+   Consistent vertical rhythm for editor rows.
+   ========================================= */
+.field-block,
+.control-block,
+.panel-sub,
+.toggle-row {
+  margin-bottom: 18px;
+}
+
+.label-row,
+.section-label,
+.subheader,
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+label,
+.section-label,
+.field-inline label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* =========================================
+   DARK GLASS INPUTS
+   All text inputs and textareas styled as
+   dark frosted-glass fields.
+   ========================================= */
+.field-block input,
+.field-block textarea,
+.field-inline input,
+.hex-input,
+#shareLinkInput {
+  width: 100%;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.field-block input::placeholder,
+.field-block textarea::placeholder,
+.field-inline input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.field-block input:focus,
+.field-block textarea:focus,
+.field-inline input:focus,
+.hex-input:focus,
+#shareLinkInput:focus {
+  outline: none;
+  border-color: var(--input-focus-blue);
+  box-shadow: 0 0 0 3px var(--input-focus-glow);
+}
+
+.field-block textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.field-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   FONT SELECTION BUTTONS
+   // Title font selection
+   // Description font selection
+   // Roboto font (English)
+   // Mandali font (Telugu)
+   Premium segmented control style.
+   Selected = BTV gradient + white text.
+   Unselected = transparent glass + muted text.
+   ========================================= */
+.font-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.font-btn {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
+.font-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.font-btn.active {
+  background: linear-gradient(135deg, var(--brand-blue), #1D4ED8);
+  color: #FFFFFF;
+  border-color: rgba(37, 99, 235, 0.60);
+  box-shadow: 0 2px 10px rgba(11, 31, 216, 0.40);
+}
+
+.font-btn[data-font="Mandali"],
+.font-btn[data-font="Telugu"],
+.font-btn[data-font="Noto Sans Telugu"] {
+  font-family: "Noto Sans Telugu", "Mandali", sans-serif;
+}
+
+.font-btn[data-font="Roboto"],
+.font-btn[data-font="English"] {
+  font-family: "Roboto", sans-serif;
+}
+
+/* =========================================
+   PASTE / CLEAR BUTTONS (MINI ACTIONS)
+   Premium glass pill buttons with hover lift.
+   Clear uses a subtle red accent on hover.
+   ========================================= */
+.mini-actions,
+.secondary-actions,
+.publish-buttons,
+.download-grid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mini-btn {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  transition: all var(--t-fast);
+  letter-spacing: 0.03em;
+}
+
+.mini-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.20);
+}
+
+/* Clear button subtle red on hover */
+.mini-btn[data-action="clear-title"]:hover,
+.mini-btn[data-action="clear-description"]:hover {
+  background: rgba(227, 27, 35, 0.15);
+  border-color: rgba(227, 27, 35, 0.40);
+  color: #FCA5A5;
+}
+
+/* =========================================
+   TITLE SIZE / DESCRIPTION SIZE / GAP CONTROLS
+   Each control is a premium settings row showing:
+   [ − ]   value pill   [ + ]
+   The value pill glows with BTV blue.
+   ========================================= */
+.control-block {
+  background: var(--subpanel-glass);
+  border: 1px solid var(--subpanel-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex: 0 0 auto;
+}
+
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Step +/- buttons — circular glass */
+.step-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  color: var(--text-main);
+  transition: all var(--t-fast);
+}
+
+.step-btn:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.60);
+  color: #93C5FD;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.step-btn:disabled {
+  opacity: 0.30;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.35);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Value pill — glowing BTV blue */
+.value-pill {
+  min-width: 68px;
+  padding: 7px 14px;
+  text-align: center;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.18);
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  color: #93C5FD;
+  font-weight: 800;
+  font-size: 0.88rem;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.20);
+}
+
+/* =========================================
+   CARD DESIGN SECTION
+   Premium glass sub-panel with red accent heading.
+   All existing color pickers & preset buttons preserved.
+   ========================================= */
+.card-design-panel,
+.panel-sub {
+  background: var(--subpanel-glass);
+  border: 1px solid var(--subpanel-border);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.subheader {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 12px;
+  margin-top: 12px;
+}
+
+.color-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-control label {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.color-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-input-group input[type="color"] {
+  width: 52px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.hex-input {
+  min-height: 42px;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+}
+
+/* Preset theme buttons */
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.preset-btn {
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.80rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  transition: all var(--t-fast);
+}
+
+.preset-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.preset-btn.active {
+  background: linear-gradient(135deg, var(--brand-red), #B91C1C);
+  border-color: transparent;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(227, 27, 35, 0.35);
+}
+
+/* =========================================
+   IMAGE UPLOAD / CROP SECTION
+   Glass upload area with styled range sliders.
+   ========================================= */
+.upload-label {
+  display: inline-block;
+  margin: 12px 0 10px;
+  font-size: 0.80rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+#imageUpload {
+  width: 100%;
+  border: 1.5px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  transition: border-color var(--t-fast);
+}
+
+#imageUpload:hover {
+  border-color: rgba(37, 99, 235, 0.50);
+}
+
+.crop-controls {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.crop-controls label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.crop-controls input[type="range"] {
+  width: 100%;
+  accent-color: var(--brand-blue-mid);
+}
+
+/* =========================================
+   ACTION BUTTONS (SECONDARY / PRIMARY / DOWNLOAD)
+   Glass secondary buttons and BTV red primary buttons.
+   Hover: subtle lift + glow.
+   ========================================= */
+.secondary-btn,
+.primary-btn,
+.download-btn {
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  transition: all var(--t-fast);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-main);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20);
+}
+
+.secondary-btn.danger {
+  color: #FCA5A5;
+}
+
+.secondary-btn.danger:hover {
+  background: rgba(227, 27, 35, 0.15);
+  border-color: rgba(227, 27, 35, 0.40);
+  color: #EF4444;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--brand-red) 0%, #B91C1C 100%);
+  border-color: transparent;
+  color: #FFFFFF;
+  box-shadow: 0 6px 18px rgba(227, 27, 35, 0.30);
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #FF2E36 0%, #D31820 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(227, 27, 35, 0.48);
+}
+
+.field-inline {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* =========================================
+   AUTO-FIT TOGGLE ROW
+   ========================================= */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.switch input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand-blue-mid);
+}
+
+/* =========================================
+   LIVE PREVIEW PANEL
+   Right side sticky panel with canvas preview.
+   The BTV card itself is NOT modified.
+   Only the container around it is improved.
+   ========================================= */
+.preview-panel {
+  position: sticky;
+  top: 20px;
+}
+
+.preview-header {
+  padding-bottom: 4px;
+}
+
+/* "Preview Render" button in header */
+.preview-btn {
+  background: rgba(37, 99, 235, 0.14);
+  border: 1px solid rgba(37, 99, 235, 0.30);
+  color: #93C5FD;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+  transition: all var(--t-fast);
+}
+
+.preview-btn:hover {
+  background: rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.55);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+/* =========================================
+   LIVE INDICATOR
+   Small glowing red dot + "LIVE PREVIEW" label
+   shown above the preview stage.
+   ========================================= */
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 10px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-red);
+  box-shadow: 0 0 8px rgba(227, 27, 35, 0.80);
+  animation: livePulse 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.live-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(227, 27, 35, 0.80); }
+  50%        { opacity: 0.6; box-shadow: 0 0 4px rgba(227, 27, 35, 0.40); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}
+
+/* =========================================
+   PREVIEW STAGE (canvas container)
+   Dark premium container around the BTV card.
+   Thin glowing border + soft shadow.
+   ========================================= */
+.preview-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0 10px;
+}
+
+#newsCanvas {
+  display: block;
+  width: min(100%, 360px);
+  aspect-ratio: 9 / 16;
+  height: auto;
+  max-width: 100%;
+  background: #200811;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 4px;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(227, 27, 35, 0.06),
+    0 0 40px rgba(11, 31, 216, 0.08);
+}
+
+/* =========================================
+   BTV NEWS CARD CSS PREVIEW
+   Controls the card preview and main 9:16 layout.
+   DO NOT modify — this mirrors the canvas exactly.
+   ========================================= */
+.news-card-preview {
+  --card-gap: 18px;
+  --title-size: 48px;
+  --desc-size: 30px;
+  --title-color: #F3C74A;
+  --highlight-color: #A10D1F;
+  --accent-color: #3F0A19;
+  --text-color: #F5F1F3;
+  position: relative;
+  width: min(100%, 360px);
+  aspect-ratio: 9 / 16;
+  background: #200811;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(7, 26, 82, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--text-color);
+}
+
+.news-card-preview::before,
+.news-card-preview::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.news-card-preview::before {
+  width: 540px;
+  height: 540px;
+  left: -150px;
+  top: 180px;
+}
+
+.news-card-preview::after {
+  width: 420px;
+  height: 420px;
+  right: -110px;
+  bottom: 240px;
+}
+
+/* =========================================
+   NEWS CARD TOP HEADER
+   Fixed BTV Brand Title, Date & Independent Reporter Row
+   ========================================= */
+.card-header,
+.news-card-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72px;
+  padding: 16px 22px 14px;
+  background: linear-gradient(90deg, #7C0A20 0%, #A10D1F 50%, #B4152A 100%);
+  border-bottom: 3px solid #E5122E;
+  box-sizing: border-box;
+}
+
+.header-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.btv-brand-title {
+  font-family: 'Roboto', 'Noto Sans Telugu', sans-serif;
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.card-date,
+.preview-date {
+  font-family: 'Noto Sans Telugu', 'Mandali', sans-serif;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.reporter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.reporter-row:empty {
+  display: none;
+}
+
+.header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.header-brand-mini,
+.brand-stack {
+  display: flex;
+  align-items: flex-start;
+}
+
+.header-brand-mini {
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-stack {
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.mini-logo,
+.footer-logo {
+  display: block;
+  width: auto;
+  height: 30px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.mini-brand-text {
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  font-size: 1.05rem;
+}
+
+.mini-tagline {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* =========================================
+   NEWS IMAGE
+   Controls the uploaded story image and framing.
+   ========================================= */
+.preview-media {
+  position: relative;
+  z-index: 1;
+  height: 220px;
+  margin: 26px 24px 0;
+  border-radius: 18px;
+  border: 2px solid rgba(240, 128, 80, 0.9);
+  background-color: #3d1229;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* =========================================
+   NEWS TITLE & DESCRIPTION
+   Controls title typography and spacing.
+   ========================================= */
+.preview-copy {
+  position: relative;
+  z-index: 1;
+  padding: 18px 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+.preview-copy h3 {
+  margin: 0;
+  padding-top: 6px;
+  color: var(--title-color);
+  font-size: var(--title-size);
+  font-weight: 800;
+  line-height: 1.30;
+  letter-spacing: 0.01em;
+  overflow: visible;
+}
+
+.preview-copy p {
+  margin: 0;
+  color: var(--text-color);
+  font-size: var(--desc-size);
+  line-height: 1.5;
+}
+
+/* =========================================
+   REPORTER SECTION
+   Controls the reporter name and designation.
+   ========================================= */
+.preview-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px 22px;
+  background: linear-gradient(90deg, #7C0A20 0%, #A10D1F 50%, #B4152A 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.reporter-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#previewReporterName,
+#previewReporterDesignation {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+#previewReporterDesignation {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+}
+
+/* =========================================
+   PUBLISH & DOWNLOAD BOXES
+   Below the preview canvas in the right panel.
+   ========================================= */
+.publish-box,
+.download-box {
+  margin-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 18px;
+}
+
+.download-box h3 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  margin-bottom: 12px;
+}
+
+#shareLinkInput {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.copy-status {
+  min-height: 1.2em;
+  margin: 10px 0 0;
+  color: #60A5FA;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.download-grid {
+  margin-top: 12px;
+}
+
+/* Download buttons — glass style */
+.download-btn {
+  flex: 1 1 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 10px;
+  transition: all var(--t-fast);
+}
+
+.download-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.download-btn.subtle {
+  background: rgba(37, 99, 235, 0.10);
+  border-color: rgba(37, 99, 235, 0.25);
+  color: #93C5FD;
+}
+
+.download-btn.subtle:hover {
+  background: rgba(37, 99, 235, 0.20);
+  border-color: rgba(37, 99, 235, 0.50);
+}
+
+/* =========================================
+   CATEGORY SELECTION MODAL STYLES
+   // Category selection
+   ========================================= */
+.category-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 25, 0.80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.category-modal-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.category-modal-card {
+  background: rgba(10, 18, 52, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.65),
+    0 0 40px rgba(11, 31, 216, 0.12);
+  width: min(100%, 540px);
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.94) translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.category-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.category-modal-title {
+  margin: 0;
+  color: #FFFFFF;
+  font-size: 1.22rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.category-modal-subtitle {
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.84rem;
+}
+
+.category-modal-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all var(--t-fast);
+}
+
+.category-modal-close:hover {
+  background: rgba(227, 27, 35, 0.20);
+  border-color: rgba(227, 27, 35, 0.50);
+  color: #EF4444;
+}
+
+.category-modal-body {
+  padding: 24px;
+}
+
+.category-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.category-checkbox-item {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.category-checkbox-item input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.category-badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  color: #94A3B8;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: all var(--t-fast);
+}
+
+.category-badge-pill .check-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: transparent;
+  transition: all var(--t-fast);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.category-checkbox-item:hover .category-badge-pill {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+}
+
+.category-checkbox-item input[type="checkbox"]:checked + .category-badge-pill {
+  background: linear-gradient(135deg, rgba(11, 31, 216, 0.35), rgba(227, 27, 35, 0.35));
+  border-color: #E31B23;
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(227, 27, 35, 0.25);
+}
+
+.category-checkbox-item input[type="checkbox"]:checked + .category-badge-pill .check-icon {
+  background: #E31B23;
+  border-color: #E31B23;
+  color: #FFFFFF;
+}
+
+.category-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 24px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.category-modal-footer .secondary-btn {
+  width: auto;
+  padding: 10px 20px;
+}
+
+.category-modal-footer .publish-confirm-btn {
+  width: auto;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 10px 24px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   Controls tablet and mobile layout adjustments.
+   Mobile: editor stacks above preview.
+   ========================================= */
+@media (max-width: 1040px) {
+  .dashboard-main {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px 10px;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Row 1: BTV Logo & Brand */
+  .brand-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .brand-logo {
+    height: 38px;
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .brand-copy {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    min-width: 0;
+  }
+
+  .brand-main {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .brand-sub {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--brand-red);
+    white-space: nowrap;
+  }
+
+  /* Row 2: Navigation (+ New Card on left, Profile on right) */
+  .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    margin-top: 2px;
+    flex-wrap: nowrap;
+  }
+
+  .header-nav .nav-link {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .profile-menu-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .profile-btn {
+    width: auto;
+    max-width: 100%;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 10px 4px 5px;
+    font-size: 0.82rem;
+    border-radius: 9999px;
+  }
+
+  .profile-avatar-thumb {
+    width: 26px;
+    height: 26px;
+    font-size: 0.76rem;
+    flex-shrink: 0;
+  }
+
+  .profile-btn-label {
+    max-width: 85px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-align: left;
+  }
+
+  .profile-chevron {
+    flex-shrink: 0;
+  }
+
+  .profile-dropdown {
+    position: fixed;
+    top: 108px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: calc(100vw - 24px);
+    margin: 0 auto;
+    padding: 16px 14px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), 0 0 30px rgba(11, 31, 216, 0.2);
+  }
+
+  .dashboard-main {
+    padding: 14px 12px 24px;
+  }
+
+  .editor-panel,
+  .preview-panel {
+    padding: 16px 14px;
+  }
+
+  .color-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-btn {
+    width: 100%;
+  }
+
+  .publish-buttons,
+  .secondary-actions,
+  .download-grid {
+    flex-direction: column;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .download-btn {
+    width: 100%;
+  }
+
+  /* Size control rows stack nicely on mobile */
+  .control-block {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .section-label {
+    flex: 0 0 100%;
+    margin-bottom: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    padding: 10px 12px 8px;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    height: 32px;
+  }
+
+  .brand-main {
+    font-size: 1rem;
+  }
+
+  .brand-sub {
+    font-size: 0.52rem;
+  }
+
+  .header-nav {
+    gap: 6px;
+  }
+
+  .header-nav .nav-link {
+    font-size: 0.78rem;
+    padding: 6px 9px;
+  }
+
+  .profile-btn {
+    font-size: 0.78rem;
+    padding: 3px 8px 3px 4px;
+  }
+
+  .profile-avatar-thumb {
+    width: 24px;
+    height: 24px;
+    font-size: 0.72rem;
+  }
+
+  .profile-btn-label {
+    max-width: 72px;
+  }
+
+  .profile-dropdown {
+    top: 96px;
+    left: 8px;
+    right: 8px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .profile-card-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profile-photo-wrap {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+  }
+
+  .profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-details {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .profile-name {
+    font-size: 0.90rem;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-meta-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 3px;
+    width: 100%;
+  }
+
+  .profile-id-badge,
+  .profile-dob-badge {
+    font-size: 0.70rem;
+    padding: 2px 5px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  .profile-menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    font-size: 0.84rem;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+  }
+
+  .category-selection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .label-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .field-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .font-toggle-group {
+    flex-grow: 1;
+  }
+
+  .font-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* =========================================
+   MY CARDS PANEL
+   (Unchanged — just updated for dark theme)
+   ========================================= */
+.my-cards-panel {
+  position: relative;
+  z-index: 2;
+  max-width: 1500px;
+  margin: 0 auto 30px;
+  padding: 22px 24px;
+}
+
+.my-cards-header {
+  margin-bottom: 16px;
+}
+
+.my-cards-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.my-card-item {
+  border: 1px solid var(--subpanel-border);
+  border-radius: 16px;
+  background: var(--subpanel-glass);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+.my-card-thumb {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--subpanel-border);
+}
+
+.my-card-body {
+  padding: 14px;
+}
+
+.my-card-body h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  margin-bottom: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(15, 157, 113, 0.15);
+  color: #34D399;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.my-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.my-card-actions button {
+  flex: 1 1 0;
+  min-height: 34px;
+  font-size: 0.78rem;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--subpanel-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font-weight: 700;
+  transition: all var(--t-fast);
+}
+
+.my-card-actions button:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.my-card-actions button.danger {
+  color: #FCA5A5;
+}
+
+.my-card-actions button.danger:hover {
+  background: rgba(227, 27, 35, 0.15);
+  color: #EF4444;
+}
+
+.empty-state {
+  padding: 20px;
+  color: var(--text-secondary);
+  text-align: center;
+}

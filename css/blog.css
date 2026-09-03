@@ -1,0 +1,238 @@
+:root {
+  --page-bg: #F5F7FB;
+  --header-bg: #071A52;
+  --header-text: #FFFFFF;
+  --panel-bg: #FFFFFF;
+  --panel-border: #E2E8F0;
+  --brand-blue: #0B1FD8;
+  --brand-red: #E31B23;
+  --text-main: #111827;
+  --text-secondary: #64748B;
+}
+
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--page-bg);
+  color: var(--text-main);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 24px;
+  background: var(--header-bg);
+  color: var(--header-text);
+  flex-wrap: wrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   BACK NAVIGATION BUTTON
+   // Back navigation code: returns user to previous page/dashboard.
+   ========================================= */
+.back-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  min-height: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.back-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateX(-2px);
+}
+
+.back-nav-btn:active {
+  transform: scale(0.97);
+}
+
+.back-nav-btn .back-arrow {
+  font-size: 1.1rem;
+  font-weight: 900;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.back-nav-btn:hover .back-arrow {
+  transform: translateX(-3px);
+}
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  display: block;
+  width: auto;
+  height: 46px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.brand-main {
+  font-size: clamp(1.1rem, 1.5vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--header-text);
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--header-text);
+  font-weight: 700;
+  background: rgba(255,255,255,0.06);
+}
+
+.blog-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px 40px;
+}
+
+.blog-header-block {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--brand-red);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+}
+
+.blog-header-block h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: var(--text-main);
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.post-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 14px 32px rgba(7, 26, 82, 0.06);
+}
+
+.post-image {
+  width: 100%;
+  aspect-ratio: 9 / 8;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.post-content {
+  padding: 18px 16px 20px;
+}
+
+.post-content h3 {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  color: var(--text-main);
+}
+
+.post-date {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.post-summary {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 10px 16px;
+  background: var(--brand-red);
+  color: #FFFFFF;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-nav {
+    width: 100%;
+  }
+
+  .nav-link { width: 100%; }
+
+  .blog-main {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
