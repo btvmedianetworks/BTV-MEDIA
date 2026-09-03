@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BTV News Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Mandali&family=Noto+Sans+Telugu:wght@400;600;700;800&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body class="dashboard-body">
+    <!-- ==========================================
+         FLOATING BACKGROUND ORBS
+         4 large blurred glow orbs that slowly float
+         behind the UI. pointer-events: none keeps
+         them non-interactive. Controlled in dashboard.css
+         under .ambient-glow-container / .glow-orb.
+         ========================================== -->
+    <div class="ambient-glow-container" aria-hidden="true">
+      <div class="glow-orb glow-orb-1"></div>
+      <div class="glow-orb glow-orb-2"></div>
+      <div class="glow-orb glow-orb-3"></div>
+      <div class="glow-orb glow-orb-4"></div>
+    </div>
+    <!-- ==========================================
+         DASHBOARD HEADER
+         Top navigation and site branding.
+         ========================================== -->
+    <header class="dashboard-header">
+      <div class="brand-wrap" aria-label="BTV media brand">
+        <img src="assets/btv-logo.png" alt="BTV Media logo" class="brand-logo" />
+        <div class="brand-copy">
+          <span class="brand-main">BTV MEDIA</span>
+          <span class="brand-sub">NEWS SYSTEM</span>
+        </div>
+      </div>
+
+      <nav class="header-nav" aria-label="Dashboard navigation">
+        <button type="button" class="nav-link active" data-action="new-card">+ New Card</button>
+
+        <!-- ==========================================
+             PROFILE BUTTON & DROPDOWN MENU
+             Controls access to Reporter Details, My Cards, and Logout.
+             ========================================== -->
+        <div class="profile-menu-wrap" id="profileMenuWrap">
+          <button type="button" class="profile-btn" id="profileBtn" aria-expanded="false" aria-label="Reporter Profile">
+            <span class="profile-avatar-thumb" id="headerProfileAvatar">R</span>
+            <span class="profile-btn-label" id="headerProfileName">Profile</span>
+            <svg class="profile-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Profile Dropdown Content -->
+          <div class="profile-dropdown" id="profileDropdown" aria-hidden="true">
+            <div class="profile-card-header">
+              <div class="profile-photo-wrap" id="profileCardPhotoWrap">
+                <img id="profileCardPhoto" class="profile-photo hidden" src="" alt="Reporter Photo" />
+                <div id="profileCardAvatarFallback" class="profile-avatar-fallback">R</div>
+              </div>
+              <div class="profile-details">
+                <div class="profile-name" id="profileReporterName">Reporter</div>
+                <div class="profile-meta-row">
+                  <div class="profile-id-badge">
+                    <span class="id-label">ID:</span>
+                    <span class="id-value" id="profileReporterId">—</span>
+                  </div>
+                  <div class="profile-dob-badge" id="profileDobWrap">
+                    <span class="dob-label">DOB:</span>
+                    <span class="dob-value" id="profileReporterDob">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-divider"></div>
+
+            <div class="profile-menu-links">
+              <!-- My Cards Option -->
+              <a href="my-cards.html" class="profile-menu-item" id="profileMyCardsBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                <span>My Cards</span>
+              </a>
+
+              <!-- Logout Option -->
+              <button type="button" class="profile-menu-item danger" id="profileLogoutBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ==========================================
+         MAIN EDITOR + PREVIEW LAYOUT
+         Left side editor and right side live card preview.
+         ========================================== -->
+    <main class="dashboard-main">
+      <!-- ==========================================
+           EDITOR PANEL
+           Controls the card title, description, colors,
+           image crop, reporter info and card settings.
+           ========================================== -->
+      <section class="editor-panel panel">
+        <div class="panel-header">
+          <h2>New Card</h2>
+        </div>
+
+        <!-- ==========================================
+             TITLE SECTION & FONT SELECTION
+             // Title font selection
+             // Roboto font
+             // Mandali font
+             ========================================== -->
+        <div class="field-block">
+          <div class="label-row">
+            <label for="titleInput">Title</label>
+            <div class="field-header-actions">
+              <!-- Title font selection buttons: English (Roboto) and Telugu (Noto Sans Telugu) -->
+              <div class="font-toggle-group" id="titleFontGroup" role="group" aria-label="Title font selection">
+                <!-- Roboto font -->
+                <button type="button" class="font-btn active" data-field="title" data-font="Roboto" id="titleFontRoboto" title="English - Roboto">English</button>
+                <!-- Telugu font -->
+                <button type="button" class="font-btn" data-field="title" data-font="Mandali" id="titleFontMandali" title="Telugu - Noto Sans Telugu">Telugu</button>
+              </div>
+              <div class="mini-actions">
+                <button type="button" class="mini-btn" data-action="paste-title">Paste</button>
+                <button type="button" class="mini-btn" data-action="clear-title">Clear</button>
+              </div>
+            </div>
+          </div>
+          <input id="titleInput" type="text" placeholder="Enter headline" maxlength="150" />
+          <div id="titleCounter" class="char-counter">0 / 150</div>
+        </div>
+
+        <!-- ==========================================
+             DESCRIPTION SECTION & FONT SELECTION
+             // Description font selection
+             // Roboto font
+             // Noto Sans Telugu font
+             ========================================== -->
+        <div class="field-block">
+          <div class="label-row">
+            <label for="descriptionInput">Description</label>
+            <div class="field-header-actions">
+              <!-- Description font selection buttons: English (Roboto) and Telugu (Noto Sans Telugu) -->
+              <div class="font-toggle-group" id="descriptionFontGroup" role="group" aria-label="Description font selection">
+                <!-- Roboto font -->
+                <button type="button" class="font-btn active" data-field="description" data-font="Roboto" id="descriptionFontRoboto" title="English - Roboto">English</button>
+                <!-- Telugu font -->
+                <button type="button" class="font-btn" data-field="description" data-font="Mandali" id="descriptionFontMandali" title="Telugu - Noto Sans Telugu">Telugu</button>
+              </div>
+              <div class="mini-actions">
+                <button type="button" class="mini-btn" data-action="paste-description">Paste</button>
+                <button type="button" class="mini-btn" data-action="clear-description">Clear</button>
+              </div>
+            </div>
+          </div>
+          <textarea id="descriptionInput" rows="5" placeholder="Describe the story" maxlength="600"></textarea>
+          <div id="descriptionCounter" class="char-counter">0 / 600</div>
+        </div>
+
+        <div class="control-block">
+          <div class="section-label">Title Size</div>
+          <div class="size-control">
+            <button type="button" class="step-btn" data-target="titleSize" data-step="-2">−</button>
+            <span id="titleSizeValue" class="value-pill">54px</span>
+            <button type="button" class="step-btn" data-target="titleSize" data-step="2">+</button>
+          </div>
+        </div>
+
+        <div class="control-block">
+          <div class="section-label">Description Size</div>
+          <div class="size-control">
+            <button type="button" class="step-btn" data-target="descriptionSize" data-step="-2">−</button>
+            <span id="descriptionSizeValue" class="value-pill">30px</span>
+            <button type="button" class="step-btn" data-target="descriptionSize" data-step="2">+</button>
+          </div>
+        </div>
+
+        <div class="control-block">
+          <div class="section-label">Gap / Spacing</div>
+          <div class="size-control">
+            <button type="button" class="step-btn" data-target="gap" data-step="-2">−</button>
+            <span id="gapValue" class="value-pill">24px</span>
+            <button type="button" class="step-btn" data-target="gap" data-step="2">+</button>
+          </div>
+        </div>
+
+        <div class="card-design-panel panel-sub">
+          <div class="subheader">
+            <h3>Card Design</h3>
+          </div>
+
+          <div class="color-grid">
+            <div class="color-control">
+              <label for="titleColorPicker">Title Color</label>
+              <div class="color-input-group">
+                <input type="color" id="titleColorPicker" value="#F3C74A" />
+                <input type="text" id="titleColorHex" class="hex-input" value="#F3C74A" maxlength="7" />
+              </div>
+            </div>
+
+            <div class="color-control">
+              <label for="highlightColorPicker">Highlight Color</label>
+              <div class="color-input-group">
+                <input type="color" id="highlightColorPicker" value="#A10D1F" />
+                <input type="text" id="highlightColorHex" class="hex-input" value="#A10D1F" maxlength="7" />
+              </div>
+            </div>
+
+            <div class="color-control">
+              <label for="textColorPicker">Text Color</label>
+              <div class="color-input-group">
+                <input type="color" id="textColorPicker" value="#F5F1F3" />
+                <input type="text" id="textColorHex" class="hex-input" value="#F5F1F3" maxlength="7" />
+              </div>
+            </div>
+
+            <div class="color-control">
+              <label for="accentColorPicker">Accent Color</label>
+              <div class="color-input-group">
+                <input type="color" id="accentColorPicker" value="#3F0A19" />
+                <input type="text" id="accentColorHex" class="hex-input" value="#3F0A19" maxlength="7" />
+              </div>
+            </div>
+          </div>
+
+          <div class="preset-row" aria-label="Theme presets">
+            <button type="button" class="preset-btn active" data-theme="royal-red">Royal Red</button>
+            <button type="button" class="preset-btn" data-theme="deep-blue">Deep Blue</button>
+            <button type="button" class="preset-btn" data-theme="nature">Nature</button>
+            <button type="button" class="preset-btn" data-theme="summer">Summer</button>
+            <button type="button" class="preset-btn" data-theme="purple">Purple</button>
+            <button type="button" class="preset-btn" data-theme="pastel">Pastel</button>
+            <button type="button" class="preset-btn" data-theme="gold">Gold</button>
+            <button type="button" class="preset-btn" data-theme="dark">Dark</button>
+            <button type="button" class="preset-btn" data-theme="cyan">Cyan</button>
+          </div>
+        </div>
+
+        <div class="panel-sub photo-panel">
+          <div class="subheader">
+            <h3>Photo &amp; Crop</h3>
+          </div>
+
+          <label class="upload-label" for="imageUpload">Upload image</label>
+          <input id="imageUpload" type="file" accept="image/*" />
+
+          <div class="crop-controls">
+            <label>
+              Zoom
+              <input type="range" id="cropZoom" min="1" max="2" step="0.01" value="1" />
+            </label>
+            <label>
+              Horizontal
+              <input type="range" id="cropX" min="0" max="100" step="1" value="50" />
+            </label>
+            <label>
+              Vertical
+              <input type="range" id="cropY" min="0" max="100" step="1" value="50" />
+            </label>
+          </div>
+
+          <div class="secondary-actions">
+            <button type="button" class="secondary-btn" id="applyCropBtn">Apply Crop</button>
+            <button type="button" class="secondary-btn" id="resetCropBtn">Reset Crop</button>
+            <button type="button" class="secondary-btn" id="replaceImageBtn">Replace Image</button>
+          </div>
+        </div>
+
+        <div class="panel-sub reporter-panel">
+          <div class="subheader">
+            <h3>Reporter Details</h3>
+          </div>
+
+          <div class="field-inline">
+            <label for="reporterNameInput">Reporter Name</label>
+            <input id="reporterNameInput" type="text" placeholder="Mani, Ravi Kumar" />
+          </div>
+
+          <div class="field-inline">
+            <label for="reporterDesignationInput">Designation</label>
+            <input id="reporterDesignationInput" type="text" placeholder="Reporter, శ్రీకాకుళం" />
+          </div>
+
+          <div class="secondary-actions">
+            <button type="button" class="secondary-btn" id="addReporterBtn">Add / Update Reporter</button>
+            <button type="button" class="secondary-btn danger" id="removeReporterBtn">Remove Reporter</button>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <label class="switch">
+            <input id="autoFitToggle" type="checkbox" checked />
+            <span>Auto Fit Text</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           LIVE CARD PREVIEW
+           Shows the 9:16 BTV card layout inside the editor.
+           ========================================== -->
+      <aside class="preview-panel panel">
+        <div class="panel-header preview-header">
+          <h2>Live Preview</h2>
+          <button type="button" class="nav-link active preview-btn" id="previewRenderBtn">Preview Render</button>
+        </div>
+
+        <!-- LIVE indicator — glowing dot + label -->
+        <div class="live-indicator" aria-hidden="true">
+          <span class="live-dot"></span>
+          <span class="live-label">Live Preview</span>
+        </div>
+
+        <div class="preview-stage">
+          <canvas id="newsCanvas" width="1080" height="1920" aria-label="Rendered BTV news card"></canvas>
+        </div>
+
+        <!-- PUBLISH SECTION -->
+        <div class="publish-box">
+          <div class="publish-buttons">
+            <button type="button" class="primary-btn" id="publishBtn">Publish &amp; Get Link</button>
+            <button type="button" class="secondary-btn" id="copyLinkBtn">Copy Link</button>
+          </div>
+          <input id="shareLinkInput" type="text" readonly placeholder="Published URL will appear here" />
+          <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+        </div>
+
+        <!-- ==========================================
+             DOWNLOAD SECTION
+             // Download button section: exports current card as PNG, JPG, or Story 9:16.
+             ========================================== -->
+        <div class="download-box">
+          <h3>Download</h3>
+          <div class="download-grid">
+            <button type="button" class="download-btn" id="downloadPngBtn" data-format="png">PNG</button>
+            <button type="button" class="download-btn" id="downloadJpgBtn" data-format="jpg">JPG</button>
+            <button type="button" class="download-btn subtle" id="downloadStoryBtn" data-format="story">Story 9:16</button>
+          </div>
+        </div>
+        <!-- ==========================================
+             CATEGORY SELECTION MODAL
+             // Category selection
+             Appears after clicking "Publish & Get Link"
+             to choose one or multiple categories before publishing.
+             ========================================== -->
+        <div id="categoryModal" class="category-modal-overlay hidden" aria-hidden="true" role="dialog" aria-labelledby="categoryModalTitle">
+          <div class="category-modal-card">
+            <div class="category-modal-header">
+              <div class="category-modal-title-wrap">
+                <h2 id="categoryModalTitle" class="category-modal-title">🏷️ Select Categories</h2>
+                <p class="category-modal-subtitle">Choose one or more categories for this news card</p>
+              </div>
+              <button type="button" id="closeCategoryModal" class="category-modal-close" aria-label="Close category modal">✕</button>
+            </div>
+
+            <div class="category-modal-body">
+              <div class="category-selection-grid" id="categorySelectionGrid">
+                <!-- Category selection checkboxes (8 categories) -->
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="Breaking News" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> Breaking News</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="For You" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> For You</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="News" checked />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> News</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="Politics" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> Politics</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="Business" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> Business</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="Sports" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> Sports</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="Entertainment" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> Entertainment</span>
+                </label>
+                <label class="category-checkbox-item">
+                  <input type="checkbox" name="categories" value="Crime" />
+                  <span class="category-badge-pill"><span class="check-icon">✓</span> Crime</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="category-modal-footer">
+              <button type="button" id="cancelCategoryBtn" class="secondary-btn">Cancel</button>
+              <button type="button" id="confirmPublishBtn" class="primary-btn publish-confirm-btn">Confirm &amp; Publish</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+  <script src="assets/btv-logo-dataurl.js"></script>
+  <script src="js/dashboard.js"></script>
+  </body>
+</html>
