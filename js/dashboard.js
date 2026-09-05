@@ -1404,7 +1404,8 @@ async function renderCard(props = {}) {
   ctx.restore();
 
   // =====================================================
-  // BTV CARD FOOTER (Noto Sans Telugu / Mandali Font, Bottom-Right Logo)
+  // BTV CARD FOOTER (Strict 9:16 Bounds, Fixed Height, 3-Column Layout)
+  // Order: [BTV LOGO]   [Telugu text + BTV News]   [Follow Us + icons]
   // =====================================================
   const footerRadius = 32;
 
@@ -1430,29 +1431,22 @@ async function renderCard(props = {}) {
   ctx.fillStyle = resolvedTheme.footerBorder;
   ctx.fillRect(0, footerStartY, canvas.width, 3);
 
-  const footerTextX = 54;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
+  // Geometry scaling relative to 1080p base
+  const footerScale = canvas.width / 1080;
+  const footerCenterY = footerStartY + (footerHeight / 2);
+  const sideMargin = Math.round(48 * footerScale);
 
-  // Primary Telugu text: "నిజమైన వార్తలు కోసం"
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '700 38px "Noto Sans Telugu", "Mandali", sans-serif';
-  ctx.fillText('నిజమైన వార్తలు కోసం', footerTextX, footerStartY + 76);
-
-  // Subtitle text: "BTV News · btvmedia.info"
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
-  ctx.font = '500 24px "Noto Sans Telugu", "Mandali", sans-serif';
-  ctx.fillText('BTV News · btvmedia.info', footerTextX, footerStartY + 128);
-
-  // 4. Right side: BTV Logo Image
+  // -----------------------------------------------------
+  // 1. LEFT: Existing BTV logo
+  // -----------------------------------------------------
   const logo = (btvLogo && btvLogo.complete && btvLogo.naturalWidth > 0)
     ? btvLogo
     : ((state.btvLogoImage && state.btvLogoImage.complete && state.btvLogoImage.naturalWidth > 0)
       ? state.btvLogoImage
       : cachedBtvLogo);
 
-  const maxLogoW = 216;
-  const maxLogoH = 140;
+  const maxLogoW = Math.round(180 * footerScale);
+  const maxLogoH = Math.round(114 * footerScale);
   let footerLogoWidth = maxLogoW;
   let footerLogoHeight = maxLogoH;
 
@@ -1467,9 +1461,8 @@ async function renderCard(props = {}) {
     }
   }
 
-  const logoMargin = 24;
-  const footerLogoX = canvas.width - footerLogoWidth - logoMargin;
-  const footerLogoY = canvas.height - footerLogoHeight - logoMargin;
+  const footerLogoX = sideMargin;
+  const footerLogoY = Math.round(footerCenterY - (footerLogoHeight / 2));
 
   if (logo && logo.complete && logo.naturalWidth > 0 && logo.naturalHeight > 0) {
     ctx.drawImage(
@@ -1482,6 +1475,158 @@ async function renderCard(props = {}) {
   } else {
     console.error('BTV logo not ready for Canvas rendering:', logo);
   }
+
+  // -----------------------------------------------------
+  // 2. FAR RIGHT: "Follow Us" + 4 Social Icons (YouTube, Facebook, X, Instagram)
+  // Sized +30-40% larger for high prominence and readability
+  // -----------------------------------------------------
+  const iconRadius = Math.round(25 * footerScale);
+  const iconGap = Math.round(14 * footerScale);
+  const numIcons = 4;
+  const iconsTotalWidth = (numIcons * (iconRadius * 2)) + ((numIcons - 1) * iconGap);
+  const rightSectionX = canvas.width - sideMargin - iconsTotalWidth;
+  const rightCenterX = rightSectionX + (iconsTotalWidth / 2);
+
+  // "Follow Us" text (30-40% larger, vertically centered above icons)
+  const followUsFontSize = Math.round(33 * footerScale);
+  ctx.save();
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `700 ${followUsFontSize}px "Roboto", "Noto Sans Telugu", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Follow Us', rightCenterX, footerCenterY - Math.round(26 * footerScale));
+  ctx.restore();
+
+  // 4 Social Icons (Row beneath "Follow Us", vertically centered)
+  const iconCenterY = footerCenterY + Math.round(25 * footerScale);
+  const firstIconCenterX = rightSectionX + iconRadius;
+
+  // Helper for rounded rect inside icons
+  function drawDashboardSocialRoundedRect(c, rx, ry, rw, rh, rr) {
+    const cr = Math.min(rr, rw / 2, rh / 2);
+    c.beginPath();
+    c.moveTo(rx + cr, ry);
+    c.lineTo(rx + rw - cr, ry);
+    c.quadraticCurveTo(rx + rw, ry, rx + rw, ry + cr);
+    c.lineTo(rx + rw, ry + rh - cr);
+    c.quadraticCurveTo(rx + rw, ry + rh, rx + rw - cr, ry + rh);
+    c.lineTo(rx + cr, ry + rh);
+    c.quadraticCurveTo(rx, ry + rh, rx, ry + rh - cr);
+    c.lineTo(rx, ry + cr);
+    c.quadraticCurveTo(rx, ry, rx + cr, ry);
+    c.closePath();
+  }
+
+  // 2a. YouTube Icon
+  const ytX = firstIconCenterX;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(ytX, iconCenterY, iconRadius, 0, Math.PI * 2);
+  ctx.fillStyle = '#FF0000';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(ytX - Math.round(6 * footerScale), iconCenterY - Math.round(9 * footerScale));
+  ctx.lineTo(ytX + Math.round(9 * footerScale), iconCenterY);
+  ctx.lineTo(ytX - Math.round(6 * footerScale), iconCenterY + Math.round(9 * footerScale));
+  ctx.closePath();
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  ctx.restore();
+
+  // 2b. Facebook Icon
+  const fbX = firstIconCenterX + (iconRadius * 2 + iconGap);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(fbX, iconCenterY, iconRadius, 0, Math.PI * 2);
+  ctx.fillStyle = '#1877F2';
+  ctx.fill();
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${Math.round(33 * footerScale)}px "Roboto", Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('f', fbX + Math.round(1.5 * footerScale), iconCenterY + Math.round(2 * footerScale));
+  ctx.restore();
+
+  // 2c. X (formerly Twitter) Icon
+  const xX = firstIconCenterX + 2 * (iconRadius * 2 + iconGap);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(xX, iconCenterY, iconRadius, 0, Math.PI * 2);
+  ctx.fillStyle = '#000000';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+  ctx.lineWidth = Math.max(1, Math.round(1.2 * footerScale));
+  ctx.stroke();
+
+  const xScale = 1.14 * footerScale;
+  ctx.translate(xX, iconCenterY);
+  ctx.scale(xScale, xScale);
+  ctx.translate(-12, -12);
+  const xPath = new Path2D("M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z");
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill(xPath);
+  ctx.restore();
+
+  // 2d. Instagram Icon
+  const igX = firstIconCenterX + 3 * (iconRadius * 2 + iconGap);
+  ctx.save();
+  const igGrad = ctx.createLinearGradient(igX - iconRadius, iconCenterY + iconRadius, igX + iconRadius, iconCenterY - iconRadius);
+  igGrad.addColorStop(0, '#f09433');
+  igGrad.addColorStop(0.3, '#e6683c');
+  igGrad.addColorStop(0.6, '#dc2743');
+  igGrad.addColorStop(0.85, '#cc2366');
+  igGrad.addColorStop(1, '#bc1888');
+  ctx.beginPath();
+  ctx.arc(igX, iconCenterY, iconRadius, 0, Math.PI * 2);
+  ctx.fillStyle = igGrad;
+  ctx.fill();
+
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = Math.max(2, 2.6 * footerScale);
+  drawDashboardSocialRoundedRect(ctx, igX - Math.round(12 * footerScale), iconCenterY - Math.round(12 * footerScale), Math.round(24 * footerScale), Math.round(24 * footerScale), Math.round(6.5 * footerScale));
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(igX, iconCenterY, Math.round(5.8 * footerScale), 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(igX + Math.round(6.2 * footerScale), iconCenterY - Math.round(6.2 * footerScale), Math.max(1.2, 1.8 * footerScale), 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  ctx.restore();
+
+  // -----------------------------------------------------
+  // 3. MIDDLE: Telugu text + BTV News
+  // "నిజమైన వార్తలు కోసం"
+  // "BTV News · btvmedia.info"
+  // Perfectly centered horizontally and vertically
+  // -----------------------------------------------------
+  const middleCenterX = canvas.width / 2;
+  const maxMiddleWidth = rightSectionX - (footerLogoX + footerLogoWidth) - Math.round(32 * footerScale);
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Primary Telugu line: "నిజమైన వార్తలు కోసం"
+  let teluguFontSize = Math.round(34 * footerScale);
+  ctx.font = `700 ${teluguFontSize}px "Noto Sans Telugu", "Mandali", sans-serif`;
+  while (ctx.measureText('నిజమైన వార్తలు కోసం').width > maxMiddleWidth && teluguFontSize > 18 * footerScale) {
+    teluguFontSize -= 1;
+    ctx.font = `700 ${teluguFontSize}px "Noto Sans Telugu", "Mandali", sans-serif`;
+  }
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText('నిజమైన వార్తలు కోసం', middleCenterX, footerCenterY - Math.round(20 * footerScale));
+
+  // Subtitle line: "BTV News · btvmedia.info"
+  let subtitleFontSize = Math.round(23 * footerScale);
+  ctx.font = `500 ${subtitleFontSize}px "Noto Sans Telugu", "Mandali", sans-serif`;
+  while (ctx.measureText('BTV News · btvmedia.info').width > maxMiddleWidth && subtitleFontSize > 14 * footerScale) {
+    subtitleFontSize -= 1;
+    ctx.font = `500 ${subtitleFontSize}px "Noto Sans Telugu", "Mandali", sans-serif`;
+  }
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+  ctx.fillText('BTV News · btvmedia.info', middleCenterX, footerCenterY + Math.round(22 * footerScale));
+  ctx.restore();
 
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
