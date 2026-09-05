@@ -592,12 +592,34 @@ function buildCardCanvasDataUrl(card) {
     const titleLines = wrapCardTextLines(measureCtx, data.title, titleAreaWidth);
     const titleTotalHeight = titlePaddingTop + (titleLines.length * titleLineHeight);
 
-    const contentGap = Math.max(4, Math.min(36, Number(data.gap) !== undefined ? Number(data.gap) : 24));
-    const descriptionStartY = titleAreaTop + titleTotalHeight + contentGap;
+    let effectiveDescSize = descriptionFontSize;
+    let effectiveGap = Math.max(4, Math.min(36, Number(data.gap) !== undefined ? Number(data.gap) : 24));
+    let descLineHeight = Math.round(effectiveDescSize * 1.38);
+    measureCtx.font = `400 ${effectiveDescSize}px ${descFontFamily}`;
+    let descLines = wrapCardTextLines(measureCtx, data.description, titleAreaWidth);
 
-    const descLineHeight = Math.round(descriptionFontSize * 1.38);
-    measureCtx.font = `400 ${descriptionFontSize}px ${descFontFamily}`;
-    const descLines = wrapCardTextLines(measureCtx, data.description, titleAreaWidth);
+    // Auto-fit loop: dynamically scales description font size and gap so stories up to 800
+    // characters fit comfortably within availableContentHeight (970px) without overflow!
+    const minDescSize = 16;
+    while (effectiveDescSize >= minDescSize) {
+      descLineHeight = Math.round(effectiveDescSize * 1.38);
+      measureCtx.font = `400 ${effectiveDescSize}px ${descFontFamily}`;
+      descLines = wrapCardTextLines(measureCtx, data.description, titleAreaWidth);
+      const descTotalHeight = descLines.length * descLineHeight;
+      const totalHeight = titleTotalHeight + effectiveGap + descTotalHeight;
+
+      if (totalHeight <= availableContentHeight || effectiveDescSize <= minDescSize) {
+        break;
+      }
+
+      if (effectiveGap > 12) {
+        effectiveGap = Math.max(8, effectiveGap - 4);
+      } else {
+        effectiveDescSize -= 1;
+      }
+    }
+
+    const descriptionStartY = titleAreaTop + titleTotalHeight + effectiveGap;
 
     // Pre-load BTV logo asset before canvas rendering
     const logo = await loadBtvLogo();
@@ -809,13 +831,13 @@ function buildCardCanvasDataUrl(card) {
     // Description rendering
     ctx.save();
     ctx.fillStyle = data.textColor;
-    ctx.font = `400 ${descriptionFontSize}px ${descFontFamily}`;
+    ctx.font = `400 ${effectiveDescSize}px ${descFontFamily}`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
 
     descLines.forEach((line, index) => {
       const y = descriptionStartY + (index * descLineHeight);
-      if (y + descLineHeight <= contentAreaBottom + 10) {
+      if (y + descLineHeight <= contentAreaBottom + 12) {
         ctx.fillText(line, titleAreaLeft, y);
       }
     });
