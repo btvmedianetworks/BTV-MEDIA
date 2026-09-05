@@ -2,7 +2,7 @@ const POSTS_KEY = 'btvNewsPosts';
 const CURRENT_USER_KEY = 'btvNewsCurrentUser';
 // Title and Description maximum character limits
 const TITLE_MAX_LENGTH = 150;
-const DESCRIPTION_MAX_LENGTH = 600;
+const DESCRIPTION_MAX_LENGTH = 800;
 const BTV_LOGO_PATH = 'assets/btv-logo.png';
 
 // =====================================================
@@ -703,7 +703,7 @@ function validateTitle(titleValue) {
 function validateDescription(descriptionValue) {
   const value = (descriptionValue || '').trim();
   if (!value) return 'Please enter a description.';
-  if (value.length > DESCRIPTION_MAX_LENGTH) return 'Description cannot exceed 600 characters.';
+  if (value.length > DESCRIPTION_MAX_LENGTH) return `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters.`;
   return '';
 }
 
@@ -1135,13 +1135,34 @@ async function renderCard(props = {}) {
   const titleLines = wrapText(measureCtx, data.title, titleAreaWidth);
   const titleTotalHeight = titlePaddingTop + (titleLines.length * titleLineHeight);
 
-  const contentGap = Math.max(4, Math.min(36, Number(data.gap) !== undefined ? Number(data.gap) : 24));
-  const descriptionStartY = titleAreaTop + titleTotalHeight + contentGap;
+  let effectiveDescSize = descriptionFontSize;
+  let effectiveGap = Math.max(4, Math.min(36, Number(data.gap) !== undefined ? Number(data.gap) : 24));
+  let descLineHeight = Math.round(effectiveDescSize * 1.38);
+  measureCtx.font = `400 ${effectiveDescSize}px ${descFontFamily}`;
+  let descLines = wrapText(measureCtx, data.description, titleAreaWidth);
 
-  const descLineHeight = Math.round(descriptionFontSize * 1.38);
-  measureCtx.font = `400 ${descriptionFontSize}px ${descFontFamily}`;
-  // Wrap complete description text so entire story is visible
-  const descLines = wrapText(measureCtx, data.description, titleAreaWidth);
+  // Auto-fit loop: dynamically scales description font size and gap so stories up to 800
+  // characters fit comfortably within availableContentHeight (970px) without overflow!
+  const minDescSize = 16;
+  while (effectiveDescSize >= minDescSize) {
+    descLineHeight = Math.round(effectiveDescSize * 1.38);
+    measureCtx.font = `400 ${effectiveDescSize}px ${descFontFamily}`;
+    descLines = wrapText(measureCtx, data.description, titleAreaWidth);
+    const descTotalHeight = descLines.length * descLineHeight;
+    const totalHeight = titleTotalHeight + effectiveGap + descTotalHeight;
+
+    if (totalHeight <= availableContentHeight || effectiveDescSize <= minDescSize) {
+      break;
+    }
+
+    if (effectiveGap > 12) {
+      effectiveGap = Math.max(8, effectiveGap - 4);
+    } else {
+      effectiveDescSize -= 1;
+    }
+  }
+
+  const descriptionStartY = titleAreaTop + titleTotalHeight + effectiveGap;
 
   let btvLogo = cardData.btvLogoImage || state.btvLogoImage || null;
   if (!btvLogo || !btvLogo.complete || btvLogo.naturalWidth === 0) {
@@ -1372,11 +1393,11 @@ async function renderCard(props = {}) {
   ctx.fillStyle = data.textColor;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.font = `400 ${descriptionFontSize}px ${descFontFamily}`;
+  ctx.font = `400 ${effectiveDescSize}px ${descFontFamily}`;
 
   descLines.forEach((line, index) => {
     const y = descriptionStartY + (index * descLineHeight);
-    if (y + descLineHeight <= contentAreaBottom + 10) {
+    if (y + descLineHeight <= contentAreaBottom + 12) {
       ctx.fillText(line, titleAreaLeft, y);
     }
   });
@@ -1750,6 +1771,538 @@ function loadFileAsImage(file) {
   });
 }
 
+// =====================================================
+// DEDICATED IMAGE CROP MODAL CONTROLLER
+// Immediately opens when an image is selected.
+// Provides professional photo-editor controls:
+// - Aspect ratio presets: Card (47:24 ~ 940:480), 16:9, 4:3, 1:1, Freeform
+// - 4 Corner handles (dots) and 4 Middle / edge handles for resizing
+// - Center drag for positioning
+// - Rule-of-thirds grid lines
+// - Clear Cancel and Confirm Crop buttons
+// - Offscreen canvas extraction at high resolution
+// =====================================================
+const cropModalState = {
+  activeRatio: 'card',
+  image: null,
+  rawWidth: 0,
+  rawHeight: 0,
+  stageW: 0,
+  stageH: 0,
+  box: { x: 0, y: 0, w: 100, h: 100 },
+  dragMode: null, // 'move' | 'nw' | 'ne' | 'se' | 'sw' | 'n' | 'e' | 's' | 'w'
+  startX: 0,
+  startY: 0,
+  startBox: null
+};
+
+const CROP_RATIO_VALUES = {
+  card: 940 / 480, // ~1.95833 (matches card news photo area)
+  '16:9': 16 / 9,
+  '4:3': 4 / 3,
+  '1:1': 1,
+  free: null
+};
+
+function getCropRatioValue(ratioKey) {
+  return CROP_RATIO_VALUES[ratioKey] || null;
+}
+
+function updateCropBoxDom() {
+  const cropBox = document.getElementById('cropBox');
+  if (!cropBox) return;
+  const { box } = cropModalState;
+  cropBox.style.left = `${Math.round(box.x)}px`;
+  cropBox.style.top = `${Math.round(box.y)}px`;
+  cropBox.style.width = `${Math.round(box.w)}px`;
+  cropBox.style.height = `${Math.round(box.h)}px`;
+}
+
+function initCropBoxForCurrentRatio() {
+  const { stageW, stageH, activeRatio } = cropModalState;
+  if (!stageW || !stageH) return;
+
+  const ratio = getCropRatioValue(activeRatio);
+  let w = stageW * 0.92;
+  let h = stageH * 0.92;
+
+  if (ratio) {
+    if (w / h > ratio) {
+      w = h * ratio;
+    } else {
+      h = w / ratio;
+    }
+  }
+
+  w = Math.max(48, Math.min(stageW, w));
+  h = Math.max(32, Math.min(stageH, h));
+
+  cropModalState.box = {
+    x: Math.max(0, (stageW - w) / 2),
+    y: Math.max(0, (stageH - h) / 2),
+    w: w,
+    h: h
+  };
+
+  updateCropBoxDom();
+}
+
+function adjustCropBoxToRatio(newRatioKey) {
+  cropModalState.activeRatio = newRatioKey;
+  const { stageW, stageH, box } = cropModalState;
+  const ratio = getCropRatioValue(newRatioKey);
+
+  if (!ratio) {
+    return; // Freeform preserves current dimensions
+  }
+
+  const centerX = box.x + box.w / 2;
+  const centerY = box.y + box.h / 2;
+
+  let newW = box.w;
+  let newH = newW / ratio;
+
+  if (newH > stageH) {
+    newH = stageH * 0.92;
+    newW = newH * ratio;
+  }
+  if (newW > stageW) {
+    newW = stageW * 0.92;
+    newH = newW / ratio;
+  }
+
+  let newX = centerX - newW / 2;
+  let newY = centerY - newH / 2;
+
+  newX = Math.max(0, Math.min(stageW - newW, newX));
+  newY = Math.max(0, Math.min(stageH - newH, newY));
+
+  cropModalState.box = {
+    x: newX,
+    y: newY,
+    w: newW,
+    h: newH
+  };
+
+  updateCropBoxDom();
+}
+
+function openCropModal(imageElement) {
+  const modal = document.getElementById('imageCropModal');
+  const targetImg = document.getElementById('cropTargetImage');
+  const cropStage = document.getElementById('cropStage');
+  if (!modal || !targetImg || !cropStage) return;
+
+  const imgToUse = imageElement || state.newsImage;
+  if (!imgToUse || !imgToUse.src) {
+    setStatus('Please upload an image first.');
+    return;
+  }
+
+  cropModalState.image = imgToUse;
+  cropModalState.rawWidth = imgToUse.naturalWidth || imgToUse.width || 1080;
+  cropModalState.rawHeight = imgToUse.naturalHeight || imgToUse.height || 720;
+  cropModalState.activeRatio = 'card';
+
+  // Highlight default ratio button
+  document.querySelectorAll('.crop-ratio-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.ratio === 'card');
+  });
+
+  targetImg.src = imgToUse.src;
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+
+  const onImageReady = () => {
+    requestAnimationFrame(() => {
+      const stageW = targetImg.clientWidth || targetImg.naturalWidth;
+      const stageH = targetImg.clientHeight || targetImg.naturalHeight;
+      cropModalState.stageW = stageW;
+      cropModalState.stageH = stageH;
+      cropStage.style.width = `${stageW}px`;
+      cropStage.style.height = `${stageH}px`;
+      initCropBoxForCurrentRatio();
+    });
+  };
+
+  if (targetImg.complete && targetImg.naturalWidth > 0) {
+    onImageReady();
+  } else {
+    targetImg.onload = onImageReady;
+  }
+}
+
+function closeCropModal() {
+  const modal = document.getElementById('imageCropModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+  cropModalState.dragMode = null;
+  cropModalState.startBox = null;
+  if (elements.imageUpload) {
+    elements.imageUpload.value = '';
+  }
+}
+
+async function confirmCropSelection() {
+  const { image, box, stageW, stageH, rawWidth, rawHeight } = cropModalState;
+  if (!image || !stageW || !stageH || box.w <= 0 || box.h <= 0) {
+    closeCropModal();
+    return;
+  }
+
+  const scaleX = rawWidth / stageW;
+  const scaleY = rawHeight / stageH;
+
+  const sourceX = Math.max(0, Math.min(rawWidth - 1, Math.round(box.x * scaleX)));
+  const sourceY = Math.max(0, Math.min(rawHeight - 1, Math.round(box.y * scaleY)));
+  const sourceW = Math.max(10, Math.min(rawWidth - sourceX, Math.round(box.w * scaleX)));
+  const sourceH = Math.max(10, Math.min(rawHeight - sourceY, Math.round(box.h * scaleY)));
+
+  const offscreenCanvas = document.createElement('canvas');
+  offscreenCanvas.width = sourceW;
+  offscreenCanvas.height = sourceH;
+  const offCtx = offscreenCanvas.getContext('2d');
+  offCtx.imageSmoothingEnabled = true;
+  offCtx.imageSmoothingQuality = 'high';
+
+  offCtx.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceW,
+    sourceH,
+    0,
+    0,
+    sourceW,
+    sourceH
+  );
+
+  const croppedDataUrl = offscreenCanvas.toDataURL('image/jpeg', 0.95);
+
+  try {
+    const croppedImage = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Cropped image failed to load'));
+      img.src = croppedDataUrl;
+    });
+
+    state.newsImage = croppedImage;
+    state.imageData = croppedDataUrl;
+    state.crop = { zoom: 1, x: 50, y: 50 };
+    syncDisplayValues();
+    await updatePreview();
+    closeCropModal();
+    setStatus('Image cropped and applied successfully!');
+  } catch (err) {
+    console.error('Failed applying cropped image:', err);
+    closeCropModal();
+    setStatus('Error applying cropped image.');
+  }
+}
+
+function setupCropModalHandlers() {
+  const modal = document.getElementById('imageCropModal');
+  const cropBox = document.getElementById('cropBox');
+  const closeBtn = document.getElementById('closeCropModal');
+  const cancelBtn = document.getElementById('cancelCropBtn');
+  const confirmBtn = document.getElementById('confirmCropBtn');
+  const resetBtn = document.getElementById('resetCropBoxBtn');
+  const openBtn = document.getElementById('openCropModalBtn');
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      if (state.newsImage || state.imageData) {
+        openCropModal(state.newsImage);
+      } else {
+        elements.imageUpload?.click();
+      }
+    });
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeCropModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeCropModal);
+  if (confirmBtn) confirmBtn.addEventListener('click', confirmCropSelection);
+  if (resetBtn) resetBtn.addEventListener('click', initCropBoxForCurrentRatio);
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeCropModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+      closeCropModal();
+    }
+  });
+
+  // Aspect ratio presets
+  document.querySelectorAll('.crop-ratio-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.crop-ratio-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      adjustCropBoxToRatio(btn.dataset.ratio);
+    });
+  });
+
+  // Pointer drag & resize handling
+  if (cropBox) {
+    cropBox.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const handle = e.target.closest('[data-handle]');
+      cropModalState.dragMode = handle ? handle.dataset.handle : 'move';
+      cropModalState.startX = e.clientX;
+      cropModalState.startY = e.clientY;
+      cropModalState.startBox = { ...cropModalState.box };
+
+      cropBox.setPointerCapture(e.pointerId);
+    });
+
+    cropBox.addEventListener('pointermove', (e) => {
+      if (!cropModalState.dragMode || !cropModalState.startBox) return;
+      e.preventDefault();
+
+      const { stageW, stageH, dragMode, startBox, activeRatio } = cropModalState;
+      const dx = e.clientX - cropModalState.startX;
+      const dy = e.clientY - cropModalState.startY;
+      const ratio = getCropRatioValue(activeRatio);
+      const minSize = 36;
+
+      let nextX = startBox.x;
+      let nextY = startBox.y;
+      let nextW = startBox.w;
+      let nextH = startBox.h;
+
+      if (dragMode === 'move') {
+        nextX = Math.max(0, Math.min(stageW - startBox.w, startBox.x + dx));
+        nextY = Math.max(0, Math.min(stageH - startBox.h, startBox.y + dy));
+      } else {
+        // Resizing
+        if (dragMode.includes('e')) {
+          nextW = Math.max(minSize, Math.min(stageW - startBox.x, startBox.w + dx));
+        }
+        if (dragMode.includes('s')) {
+          nextH = Math.max(minSize, Math.min(stageH - startBox.y, startBox.h + dy));
+        }
+        if (dragMode.includes('w')) {
+          const maxDx = startBox.w - minSize;
+          const clampedDx = Math.max(-startBox.x, Math.min(maxDx, dx));
+          nextX = startBox.x + clampedDx;
+          nextW = startBox.w - clampedDx;
+        }
+        if (dragMode.includes('n')) {
+          const maxDy = startBox.h - minSize;
+          const clampedDy = Math.max(-startBox.y, Math.min(maxDy, dy));
+          nextY = startBox.y + clampedDy;
+          nextH = startBox.h - clampedDy;
+        }
+
+        // Apply aspect ratio lock if active
+        if (ratio) {
+          if (dragMode === 'e' || dragMode === 'w') {
+            nextH = nextW / ratio;
+            if (nextY + nextH > stageH) {
+              nextH = stageH - nextY;
+              nextW = nextH * ratio;
+            }
+          } else if (dragMode === 's' || dragMode === 'n') {
+            nextW = nextH * ratio;
+            if (nextX + nextW > stageW) {
+              nextW = stageW - nextX;
+              nextH = nextW / ratio;
+            }
+          } else if (dragMode === 'se') {
+            nextH = nextW / ratio;
+            if (nextY + nextH > stageH) {
+              nextH = stageH - nextY;
+              nextW = nextH * ratio;
+            }
+          } else if (dragMode === 'sw') {
+            nextH = nextW / ratio;
+            if (nextY + nextH > stageH) {
+              nextH = stageH - nextY;
+              nextW = nextH * ratio;
+            }
+          } else if (dragMode === 'ne') {
+            nextH = nextW / ratio;
+            nextY = startBox.y + (startBox.h - nextH);
+            if (nextY < 0) {
+              nextY = 0;
+              nextH = startBox.y + startBox.h;
+              nextW = nextH * ratio;
+            }
+          } else if (dragMode === 'nw') {
+            nextH = nextW / ratio;
+            nextY = startBox.y + (startBox.h - nextH);
+            if (nextY < 0) {
+              nextY = 0;
+              nextH = startBox.y + startBox.h;
+              nextW = nextH * ratio;
+              nextX = startBox.x + (startBox.w - nextW);
+            }
+          }
+        }
+      }
+
+      // Clamping within stage boundaries
+      nextX = Math.max(0, Math.min(stageW - minSize, nextX));
+      nextY = Math.max(0, Math.min(stageH - minSize, nextY));
+      nextW = Math.max(minSize, Math.min(stageW - nextX, nextW));
+      nextH = Math.max(minSize, Math.min(stageH - nextY, nextH));
+
+      cropModalState.box = { x: nextX, y: nextY, w: nextW, h: nextH };
+      updateCropBoxDom();
+    });
+
+    const finishDrag = () => {
+      cropModalState.dragMode = null;
+      cropModalState.startBox = null;
+    };
+
+    cropBox.addEventListener('pointerup', finishDrag);
+    cropBox.addEventListener('pointercancel', finishDrag);
+  }
+
+  // Handle window resizing
+  window.addEventListener('resize', () => {
+    const modal = document.getElementById('imageCropModal');
+    const targetImg = document.getElementById('cropTargetImage');
+    const cropStage = document.getElementById('cropStage');
+    if (!modal || modal.classList.contains('hidden') || !targetImg || !cropStage) return;
+
+    requestAnimationFrame(() => {
+      const stageW = targetImg.clientWidth || targetImg.naturalWidth;
+      const stageH = targetImg.clientHeight || targetImg.naturalHeight;
+      if (stageW && stageH) {
+        cropModalState.stageW = stageW;
+        cropModalState.stageH = stageH;
+        cropStage.style.width = `${stageW}px`;
+        cropStage.style.height = `${stageH}px`;
+        initCropBoxForCurrentRatio();
+      }
+    });
+  });
+}
+
+// =====================================================
+// DIRECT TOUCH & MOUSE PREVIEW MANIPULATION
+// Natural gestures on the live preview card:
+// - Drag/pan image horizontally & vertically (mouse / touch)
+// - Mouse wheel & pinchpad zoom on desktop
+// - 2-finger pinch-to-zoom on touchscreen/mobile
+// - Strictly bounded within card image area (clamped 0..100)
+// - Synchronized with range sliders & live preview
+// =====================================================
+function setupCanvasTouchZone() {
+  const touchZone = document.getElementById('canvasImageTouchZone');
+  if (!touchZone) return;
+
+  let isInteracting = false;
+  let startX = 0;
+  let startY = 0;
+  let startCropX = 50;
+  let startCropY = 50;
+  let initialPinchDist = null;
+  let initialPinchZoom = 1;
+  const activePointers = new Map();
+
+  touchZone.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    if (!state.imageData && !state.newsImage) return;
+
+    touchZone.setPointerCapture(e.pointerId);
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointers.size === 1) {
+      isInteracting = true;
+      touchZone.classList.add('active-drag');
+      startX = e.clientX;
+      startY = e.clientY;
+      startCropX = state.crop.x !== undefined ? state.crop.x : 50;
+      startCropY = state.crop.y !== undefined ? state.crop.y : 50;
+    } else if (activePointers.size === 2) {
+      const points = Array.from(activePointers.values());
+      initialPinchDist = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      initialPinchZoom = state.crop.zoom || 1;
+    }
+  });
+
+  touchZone.addEventListener('pointermove', (e) => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointers.size === 2 && initialPinchDist && initialPinchDist > 0) {
+      // 2-finger pinch zoom
+      const points = Array.from(activePointers.values());
+      const currentDist = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      const scaleFactor = currentDist / initialPinchDist;
+      const newZoom = Math.max(1, Math.min(3, initialPinchZoom * scaleFactor));
+      state.crop.zoom = Math.round(newZoom * 100) / 100;
+      if (elements.cropZoom) elements.cropZoom.value = state.crop.zoom;
+      updatePreview();
+    } else if (isInteracting && activePointers.size === 1) {
+      // 1-pointer / mouse pan
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const rect = touchZone.getBoundingClientRect();
+
+      // Dragging right moves image right, revealing left content (decreases cropX)
+      const sensitivity = 1.3;
+      const deltaPercentX = -(dx / rect.width) * 100 * sensitivity;
+      const deltaPercentY = -(dy / rect.height) * 100 * sensitivity;
+
+      const nextCropX = Math.max(0, Math.min(100, Math.round(startCropX + deltaPercentX)));
+      const nextCropY = Math.max(0, Math.min(100, Math.round(startCropY + deltaPercentY)));
+
+      if (nextCropX !== state.crop.x || nextCropY !== state.crop.y) {
+        state.crop.x = nextCropX;
+        state.crop.y = nextCropY;
+        if (elements.cropX) elements.cropX.value = state.crop.x;
+        if (elements.cropY) elements.cropY.value = state.crop.y;
+        updatePreview();
+      }
+    }
+  });
+
+  const endInteraction = (e) => {
+    activePointers.delete(e.pointerId);
+    if (activePointers.size === 0) {
+      isInteracting = false;
+      touchZone.classList.remove('active-drag');
+      initialPinchDist = null;
+    } else if (activePointers.size === 1) {
+      const remaining = Array.from(activePointers.values())[0];
+      startX = remaining.x;
+      startY = remaining.y;
+      startCropX = state.crop.x;
+      startCropY = state.crop.y;
+      initialPinchDist = null;
+    }
+  };
+
+  touchZone.addEventListener('pointerup', endInteraction);
+  touchZone.addEventListener('pointercancel', endInteraction);
+
+  // Mouse wheel / trackpad pinch zoom on preview
+  touchZone.addEventListener('wheel', (e) => {
+    if (!state.imageData && !state.newsImage) return;
+    e.preventDefault();
+    const currentZoom = state.crop.zoom || 1;
+    const zoomStep = e.deltaY < 0 ? 0.08 : -0.08;
+    const nextZoom = Math.max(1, Math.min(3, Math.round((currentZoom + zoomStep) * 100) / 100));
+
+    if (nextZoom !== currentZoom) {
+      state.crop.zoom = nextZoom;
+      if (elements.cropZoom) elements.cropZoom.value = state.crop.zoom;
+      updatePreview();
+    }
+  }, { passive: false });
+}
+
 async function handleImageUpload(event) {
   const [file] = event.target.files || [];
   if (!file) return;
@@ -1761,6 +2314,9 @@ async function handleImageUpload(event) {
     state.crop = { zoom: 1, x: 50, y: 50 };
     syncDisplayValues();
     await updatePreview();
+
+    // Immediately open the dedicated crop editor modal!
+    openCropModal(image);
   } catch (error) {
     console.error('BTV IMAGE UPLOAD ERROR:', error);
     setStatus('Unable to load the selected image.');
@@ -3025,6 +3581,8 @@ async function initializeDashboard() {
   setupFontSelectionHandlers();
   bindActions();
   setupCategoryModal();
+  setupCropModalHandlers();
+  setupCanvasTouchZone();
   initializeProfileMenu();
   addPresetHandlers();
   renderMyCards();
