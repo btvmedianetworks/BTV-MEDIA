@@ -1484,36 +1484,188 @@ label,
 }
 
 /* =========================================
-   REPORTER SECTION
-   Controls the reporter name and designation.
+   BTV NEWS CARD FOOTER (3-Column Layout)
+   Order: [BTV LOGO]  [Telugu text + BTV News]  [Follow Us + icons]
    ========================================= */
-.preview-footer {
+.preview-footer,
+.news-card-footer,
+.card-footer {
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 20px 24px 22px;
+  gap: 16px;
+  padding: 12px 18px;
+  height: 82px;
+  min-height: 82px;
+  max-height: 82px;
+  box-sizing: border-box;
   background: linear-gradient(90deg, #7C0A20 0%, #A10D1F 50%, #B4152A 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-top: 3px solid #E5122E;
+  margin-top: auto;
+  overflow: hidden;
 }
 
-.reporter-block {
+/* 1. LEFT: Existing BTV Logo */
+.footer-left {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+
+.footer-left .footer-logo,
+.preview-footer .footer-logo {
+  display: block;
+  width: auto;
+  height: 38px;
+  max-width: 80px;
+  max-height: 48px;
+  object-fit: contain;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* 2. MIDDLE: Telugu text + BTV News */
+.footer-middle {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 2px;
+}
+
+.footer-telugu-text {
+  font-family: 'Noto Sans Telugu', 'Mandali', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #FFFFFF;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.footer-brand-text {
+  font-family: 'Noto Sans Telugu', 'Mandali', sans-serif;
+  font-weight: 500;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* 3. FAR RIGHT: "Follow Us" + 4 Social Icons */
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   gap: 4px;
 }
 
-#previewReporterName,
-#previewReporterDesignation {
+.footer-follow-text {
+  font-family: 'Roboto', 'Noto Sans Telugu', sans-serif;
   font-weight: 700;
-  color: #ffffff;
+  font-size: 0.92rem;
+  color: #FFFFFF;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-#previewReporterDesignation {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.8rem;
+.footer-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.footer-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.footer-social-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: #FFFFFF;
+}
+
+.footer-social-icon.yt {
+  background: #FF0000;
+}
+
+.footer-social-icon.fb {
+  background: #1877F2;
+}
+
+.footer-social-icon.x {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.footer-social-icon.ig {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .preview-footer,
+  .news-card-footer,
+  .card-footer {
+    gap: 8px;
+    padding: 8px 12px;
+    height: 72px;
+    min-height: 72px;
+    max-height: 72px;
+  }
+
+  .footer-left .footer-logo,
+  .preview-footer .footer-logo {
+    height: 30px;
+    max-width: 64px;
+  }
+
+  .footer-telugu-text {
+    font-size: 0.78rem;
+  }
+
+  .footer-brand-text {
+    font-size: 0.58rem;
+  }
+
+  .footer-follow-text {
+    font-size: 0.78rem;
+  }
+
+  .footer-social-icons {
+    gap: 5px;
+  }
+
+  .footer-social-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .footer-social-icon svg {
+    width: 11px;
+    height: 11px;
+  }
 }
 
 /* =========================================
