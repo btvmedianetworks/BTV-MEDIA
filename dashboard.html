@@ -167,8 +167,8 @@
               </div>
             </div>
           </div>
-          <textarea id="descriptionInput" rows="5" placeholder="Describe the story" maxlength="600"></textarea>
-          <div id="descriptionCounter" class="char-counter">0 / 600</div>
+          <textarea id="descriptionInput" rows="5" placeholder="Describe the story" maxlength="800"></textarea>
+          <div id="descriptionCounter" class="char-counter">0 / 800</div>
         </div>
 
         <div class="control-block">
@@ -274,6 +274,7 @@
           </div>
 
           <div class="secondary-actions">
+            <button type="button" class="secondary-btn" id="openCropModalBtn">✂️ Crop Image</button>
             <button type="button" class="secondary-btn" id="applyCropBtn">Apply Crop</button>
             <button type="button" class="secondary-btn" id="resetCropBtn">Reset Crop</button>
             <button type="button" class="secondary-btn" id="replaceImageBtn">Replace Image</button>
@@ -326,7 +327,12 @@
         </div>
 
         <div class="preview-stage">
-          <canvas id="newsCanvas" width="1080" height="1920" aria-label="Rendered BTV news card"></canvas>
+          <div class="canvas-wrapper" id="canvasWrapper">
+            <canvas id="newsCanvas" width="1080" height="1920" aria-label="Rendered BTV news card"></canvas>
+            <div id="canvasImageTouchZone" class="canvas-image-touch-zone" role="region" aria-label="Image adjustment area: drag to pan, scroll wheel or pinch to zoom" tabindex="0">
+              <span class="touch-hint-pill"><span class="hint-icon">✥</span> Pan &amp; Zoom</span>
+            </div>
+          </div>
         </div>
 
         <!-- PUBLISH SECTION -->
@@ -413,6 +419,75 @@
         </div>
       </aside>
     </main>
+
+    <!-- ==========================================
+         IMAGE CROP MODAL
+         Dedicated crop editor with handles, rule of thirds,
+         aspect ratio presets, and cancel/confirm buttons.
+         ========================================== -->
+    <div id="imageCropModal" class="crop-modal-overlay hidden" aria-hidden="true" role="dialog" aria-labelledby="cropModalTitle">
+      <div class="crop-modal-card">
+        <div class="crop-modal-header">
+          <div class="crop-modal-title-wrap">
+            <h2 id="cropModalTitle" class="crop-modal-title">✂️ Crop Card Image</h2>
+            <p class="crop-modal-subtitle">Drag box to reposition · Drag corner or edge handles to resize</p>
+          </div>
+          <button type="button" id="closeCropModal" class="crop-modal-close" aria-label="Close crop modal">✕</button>
+        </div>
+
+        <div class="crop-modal-toolbar">
+          <div class="crop-ratio-group" role="group" aria-label="Crop aspect ratio">
+            <span class="toolbar-label">Ratio:</span>
+            <button type="button" class="crop-ratio-btn active" data-ratio="card">Card Photo (47:24)</button>
+            <button type="button" class="crop-ratio-btn" data-ratio="16:9">16:9</button>
+            <button type="button" class="crop-ratio-btn" data-ratio="4:3">4:3</button>
+            <button type="button" class="crop-ratio-btn" data-ratio="1:1">1:1</button>
+            <button type="button" class="crop-ratio-btn" data-ratio="free">Freeform</button>
+          </div>
+          <button type="button" id="resetCropBoxBtn" class="crop-tool-btn" title="Reset crop to full image">↺ Reset Box</button>
+        </div>
+
+        <div class="crop-modal-body">
+          <div class="crop-stage-container" id="cropStageContainer">
+            <div class="crop-stage" id="cropStage">
+              <img id="cropTargetImage" class="crop-target-image" alt="Image to crop" />
+              <div id="cropBox" class="crop-box" tabindex="0" role="region" aria-label="Crop area selection">
+                <div class="crop-grid-lines" aria-hidden="true">
+                  <span class="crop-grid-line h1"></span>
+                  <span class="crop-grid-line h2"></span>
+                  <span class="crop-grid-line v1"></span>
+                  <span class="crop-grid-line v2"></span>
+                </div>
+                <!-- 4 Corner handle dots -->
+                <div class="crop-handle handle-corner handle-nw" data-handle="nw" title="Resize top-left"></div>
+                <div class="crop-handle handle-corner handle-ne" data-handle="ne" title="Resize top-right"></div>
+                <div class="crop-handle handle-corner handle-se" data-handle="se" title="Resize bottom-right"></div>
+                <div class="crop-handle handle-corner handle-sw" data-handle="sw" title="Resize bottom-left"></div>
+                <!-- 4 Middle / edge handles -->
+                <div class="crop-handle handle-edge handle-n" data-handle="n" title="Resize top"></div>
+                <div class="crop-handle handle-edge handle-e" data-handle="e" title="Resize right"></div>
+                <div class="crop-handle handle-edge handle-s" data-handle="s" title="Resize bottom"></div>
+                <div class="crop-handle handle-edge handle-w" data-handle="w" title="Resize left"></div>
+                <!-- Center move indicator -->
+                <div class="crop-move-indicator" aria-hidden="true">
+                  <span class="move-icon">✥</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="crop-modal-footer">
+          <div class="crop-modal-tips">
+            <span class="tip-icon">💡</span> Press <strong>Confirm Crop</strong> to apply to your news card without distortion.
+          </div>
+          <div class="crop-footer-buttons">
+            <button type="button" id="cancelCropBtn" class="secondary-btn crop-cancel-btn">Cancel</button>
+            <button type="button" id="confirmCropBtn" class="primary-btn crop-confirm-btn">Confirm Crop</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   <script src="assets/btv-logo-dataurl.js"></script>
   <script src="js/dashboard.js"></script>
