@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BTV News Blog</title>
+    <link rel="stylesheet" href="css/blog.css" />
+  </head>
+  <body class="blog-body">
+    <header class="site-header blog-header">
+      <!-- ==========================================
+           BACK NAVIGATION & BRANDING
+           // Back navigation code: returns user to previous page/dashboard.
+           ========================================== -->
+      <div class="header-left">
+        <button type="button" class="back-nav-btn" id="backNavBtn" aria-label="Go back">
+          <span class="back-arrow">←</span>
+          <span>Back</span>
+        </button>
+
+        <a href="dashboard.html" class="brand-wrap" aria-label="BTV media brand">
+          <img src="assets/btv-logo.png" alt="BTV Media logo" class="brand-logo" />
+          <div class="brand-copy">
+            <span class="brand-main">BTV MEDIA</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="header-nav" aria-label="Blog navigation">
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="blog-main">
+      <section class="blog-header-block">
+        <p class="eyebrow">BTV MEDIA</p>
+        <h1>All Published Posts</h1>
+      </section>
+
+      <section id="postsGrid" class="posts-grid" aria-live="polite"></section>
+    </main>
+
+    <script src="js/blog.js"></script>
+  </body>
+</html>
