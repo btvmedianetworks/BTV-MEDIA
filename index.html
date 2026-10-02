@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BTV News | Login</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-page="login">
+    <!-- Full-page Login Background Image Layer with Dark Overlay & Subtle Floating Effect -->
+    <div class="login-bg-layer" aria-hidden="true"></div>
+
+    <!-- Atmospheric Ambient Background Orbs -->
+    <div class="ambient-glow-container" aria-hidden="true">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-3"></div>
+      <div class="glow-orb orb-4"></div>
+    </div>
+
+    <header class="site-header" aria-label="BTV media header">
+      <div class="site-brand" aria-label="BTV Media brand">
+        <img class="site-brand-logo" src="assets/btv-logo.png" alt="BTV Media logo" />
+        <div class="brand-text-wrap">
+          <span class="site-brand-text">BTV MEDIA</span>
+          <span class="site-brand-subtext">NEWS SYSTEM</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-shell">
+      <main class="auth-layout">
+        <!-- ==========================================
+             LOGIN CARD
+             ========================================== -->
+        <section class="auth-card login-card" id="loginCard" aria-labelledby="loginHeading">
+          <div class="brand-panel" aria-label="BTV brand">
+            <h1 class="brand-main" id="loginHeading">BTV</h1>
+            <p class="brand-subtitle">TRUE NEWS FOR PEOPLE</p>
+          </div>
+
+          <form id="loginForm" novalidate>
+            <!-- Reporter ID -->
+            <div class="field-group">
+              <label for="loginReporterId">Reporter ID</label>
+              <input id="loginReporterId" name="reporterId" type="text" autocomplete="username" placeholder="Enter your reporter ID" />
+              <p class="error-message" aria-live="polite"></p>
+            </div>
+
+            <div class="field-group">
+              <label for="loginPassword">Password</label>
+              <div class="password-wrap">
+                <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" />
+                <button type="button" class="toggle-password" aria-label="Show password" data-target="loginPassword">
+                  <span class="icon-eye">👁</span>
+                </button>
+              </div>
+              <p class="error-message" aria-live="polite"></p>
+            </div>
+
+            <!-- CODE -->
+            <div class="field-group">
+              <label for="loginCode">CODE</label>
+              <input
+                id="loginCode"
+                name="code"
+                type="text"
+                inputmode="numeric"
+                maxlength="4"
+                autocomplete="off"
+                placeholder="Enter code"
+              />
+              <p class="error-message" aria-live="polite"></p>
+            </div>
+
+            <!-- Forgot Password Link -->
+            <div class="forgot-link-wrap">
+              <a href="#forgot" id="forgotPasswordLink" class="forgot-password-link">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="primary-btn">Login</button>
+            <div id="loginStatus" class="status-message" aria-live="polite"></div>
+          </form>
+
+          <p class="auth-switch">
+            New user? <a href="register.html">Register here</a>
+          </p>
+        </section>
+
+        <!-- ==========================================
+             FORGOT PASSWORD CARD (MULTI-STEP FLOW)
+             ========================================== -->
+        <section class="auth-card forgot-card hidden" id="forgotPasswordCard" aria-labelledby="forgotHeading">
+          <div class="brand-panel" aria-label="BTV brand">
+            <h1 class="brand-main" id="forgotHeading">BTV</h1>
+            <p class="brand-subtitle">ACCOUNT RECOVERY</p>
+          </div>
+
+          <!-- Notice banner for OTP/code simulation -->
+          <div id="forgotNoticeBanner" class="notice-banner hidden" role="status" aria-live="polite"></div>
+
+          <!-- Step Progress Indicator -->
+          <div class="stepper-bar" id="forgotStepperBar" aria-label="Recovery steps">
+            <div class="step-dot active" id="dotStep1" data-step="1">1. Verify</div>
+            <div class="step-divider"></div>
+            <div class="step-dot" id="dotStep2" data-step="2">2. Code</div>
+            <div class="step-divider"></div>
+            <div class="step-dot" id="dotStep3" data-step="3">3. Reset</div>
+          </div>
+
+          <!-- ==========================================
+               STEP 1: ACCOUNT VERIFICATION & RECOVERY METHOD
+               // Reporter ID lookup
+               // Recovery method selection
+               ========================================== -->
+          <div id="forgotStep1" class="forgot-step-pane">
+            <div class="step-instruction">
+              <h3>Account Verification</h3>
+              <p>Enter your Reporter ID to locate your account recovery options.</p>
+            </div>
+
+            <div class="field-group">
+              <label for="forgotReporterId">Reporter ID</label>
+              <input id="forgotReporterId" type="text" autocomplete="username" placeholder="Enter your registered Reporter ID" />
+              <p id="forgotReporterIdError" class="error-message" aria-live="polite"></p>
+            </div>
+
+            <button type="button" id="findAccountBtn" class="primary-btn">Find Account</button>
+
+            <!-- Recovery Method Options (Revealed after finding account) -->
+            <div id="recoveryOptionsBox" class="recovery-options-box hidden">
+              <div class="recovery-box-header">
+                <span class="user-found-badge" id="userFoundBadge">✓ Account Found</span>
+                <p class="recovery-prompt">Select where to receive your verification code:</p>
+              </div>
+
+              <div class="recovery-radio-group">
+                <label class="recovery-radio-card" id="recoveryOptionMobile">
+                  <input type="radio" name="recoveryMethod" value="mobile" checked />
+                  <div class="recovery-card-content">
+                    <span class="recovery-icon">📱</span>
+                    <div class="recovery-details">
+                      <span class="recovery-label">Send code to Mobile</span>
+                      <strong class="recovery-masked-val" id="maskedMobileText">******0000</strong>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="recovery-radio-card" id="recoveryOptionEmail">
+                  <input type="radio" name="recoveryMethod" value="email" />
+                  <div class="recovery-card-content">
+                    <span class="recovery-icon">✉️</span>
+                    <div class="recovery-details">
+                      <span class="recovery-label">Send code to Email</span>
+                      <strong class="recovery-masked-val" id="maskedEmailText">u*****@domain.com</strong>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <button type="button" id="sendCodeBtn" class="primary-btn">Send Verification Code</button>
+            </div>
+
+            <p class="auth-switch">
+              <a href="#login" class="back-to-login-btn">← Back to Login</a>
+            </p>
+          </div>
+
+          <!-- ==========================================
+               STEP 2: VERIFICATION CODE (OTP)
+               // Verification code
+               ========================================== -->
+          <div id="forgotStep2" class="forgot-step-pane hidden">
+            <div class="step-instruction">
+              <h3>Verification Code</h3>
+              <p id="codeSentSummary">Enter the 6-digit verification code sent to your recovery contact.</p>
+            </div>
+
+            <div class="field-group">
+              <label for="otpInput">6-Digit Code</label>
+              <input id="otpInput" type="text" maxlength="6" inputmode="numeric" placeholder="Enter 6-digit code" autocomplete="one-time-code" />
+              <div class="otp-meta-row">
+                <span id="otpTimerText" class="otp-timer">Expires in 05:00</span>
+                <span id="otpAttemptsText" class="otp-attempts">5 attempts remaining</span>
+              </div>
+              <p id="otpError" class="error-message" aria-live="polite"></p>
+            </div>
+
+            <button type="button" id="verifyOtpBtn" class="primary-btn">Verify Code</button>
+
+            <div class="otp-secondary-actions">
+              <button type="button" id="resendCodeBtn" class="secondary-link-btn">Resend Code</button>
+              <button type="button" id="changeMethodBtn" class="secondary-link-btn">Change Method</button>
+            </div>
+
+            <p class="auth-switch">
+              <a href="#login" class="back-to-login-btn">← Cancel &amp; Back to Login</a>
+            </p>
+          </div>
+
+          <!-- ==========================================
+               STEP 3: RESET PASSWORD
+               // Password reset
+               // Authentication/security validation
+               ========================================== -->
+          <div id="forgotStep3" class="forgot-step-pane hidden">
+            <div class="step-instruction">
+              <h3>Reset Password</h3>
+              <p>Create a new password for your Reporter account.</p>
+            </div>
+
+            <div class="field-group">
+              <label for="resetNewPassword">New Password</label>
+              <div class="password-wrap">
+                <input id="resetNewPassword" type="password" autocomplete="new-password" placeholder="Enter new password" />
+                <button type="button" class="toggle-password" aria-label="Show password" data-target="resetNewPassword">
+                  <span class="icon-eye">👁</span>
+                </button>
+              </div>
+              <p class="password-hint">Minimum 6 characters + 1 special character</p>
+              <p class="error-message" aria-live="polite"></p>
+            </div>
+
+            <div class="field-group">
+              <label for="resetConfirmPassword">Re-enter Password</label>
+              <div class="password-wrap">
+                <input id="resetConfirmPassword" type="password" autocomplete="new-password" placeholder="Confirm your new password" />
+                <button type="button" class="toggle-password" aria-label="Show password" data-target="resetConfirmPassword">
+                  <span class="icon-eye">👁</span>
+                </button>
+              </div>
+              <p class="password-hint">Minimum 6 characters + 1 special character</p>
+              <p class="error-message" aria-live="polite"></p>
+            </div>
+
+            <p id="resetPasswordError" class="error-message" aria-live="polite"></p>
+            <button type="button" id="submitResetPasswordBtn" class="primary-btn">Confirm / Reset Password</button>
+
+            <p class="auth-switch">
+              <a href="#login" class="back-to-login-btn">← Cancel &amp; Back to Login</a>
+            </p>
+          </div>
+
+          <!-- ==========================================
+               STEP 4: RESET SUCCESS STATE
+               ========================================== -->
+          <div id="forgotStep4" class="forgot-step-pane hidden">
+            <div class="success-state reset-success-card" role="alert" aria-live="polite">
+              <div class="success-icon-badge">✓</div>
+              <h3>Password reset successfully.</h3>
+              <p>Your password has been securely updated. You can now log in with your Reporter ID and new password.</p>
+              <button type="button" id="backToLoginFromSuccessBtn" class="primary-btn">Back to Login</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+  </body>
+</html>

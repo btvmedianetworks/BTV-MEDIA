@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BTV News | Register</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-page="register">
+    <!-- Atmospheric Ambient Background Orbs -->
+    <div class="ambient-glow-container" aria-hidden="true">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-3"></div>
+      <div class="glow-orb orb-4"></div>
+    </div>
+
+    <header class="site-header" aria-label="BTV media header">
+      <!-- ==========================================
+           BACK NAVIGATION & BRANDING
+           // Back navigation code: returns user to login/previous page.
+           ========================================== -->
+      <div class="header-left">
+        <button type="button" class="back-nav-btn" id="backNavBtn" aria-label="Go back">
+          <span class="back-arrow">←</span>
+          <span>Back</span>
+        </button>
+
+        <a href="index.html" class="site-brand" aria-label="BTV Media brand">
+          <img class="site-brand-logo" src="assets/btv-logo.png" alt="BTV Media logo" />
+          <div class="brand-text-wrap">
+            <span class="site-brand-text">BTV MEDIA</span>
+            <span class="site-brand-subtext">NEWS SYSTEM</span>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-shell">
+      <main class="auth-layout register-layout">
+        <section class="auth-card register-card" aria-labelledby="registerHeading">
+          <div class="brand-panel" aria-label="BTV brand">
+            <h1 class="brand-main" id="registerHeading">B T V</h1>
+            <p class="brand-subtitle">TRUE NEWS FOR PEOPLE</p>
+          </div>
+
+          <form id="registerForm" novalidate>
+            <div class="form-grid">
+              <div class="field-group">
+                <label for="firstName">First Name</label>
+                <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <div class="field-group">
+                <label for="lastName">Last Name</label>
+                <input id="lastName" name="lastName" type="text" placeholder="Enter your last name" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <div class="field-group full-width">
+                <label for="dob">Date of Birth</label>
+                <input id="dob" name="dob" type="date" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <!-- Reporter ID -->
+              <div class="field-group full-width">
+                <label for="reporterId">Reporter ID</label>
+                <input id="reporterId" name="reporterId" type="text" autocomplete="username" placeholder="Enter your reporter ID" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <!-- ==========================================
+                   MOBILE & EMAIL REGISTRATION
+                   // Mobile/email registration
+                   ========================================== -->
+              <div class="field-group">
+                <label for="mobileNumber">Mobile Number</label>
+                <input id="mobileNumber" name="mobileNumber" type="tel" inputmode="numeric" placeholder="10-digit mobile number" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <div class="field-group">
+                <label for="email">Email ID</label>
+                <input id="email" name="email" type="email" placeholder="name@example.com" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <!-- Profile photo upload -->
+              <div class="field-group full-width photo-upload-group">
+                <label for="profilePhoto">Profile Photo <span class="field-hint">(JPG, PNG, WEBP — Max 2 MB)</span></label>
+                <div class="photo-upload-container">
+                  <input id="profilePhoto" name="profilePhoto" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" />
+                  <div id="photoPreviewContainer" class="photo-preview-container hidden">
+                    <img id="photoPreviewImg" class="photo-preview-img" src="" alt="Profile Preview" />
+                    <button type="button" id="removePhotoBtn" class="remove-photo-btn" aria-label="Remove Photo">✕</button>
+                  </div>
+                </div>
+                <p id="photoError" class="error-message" aria-live="polite"></p>
+              </div>
+
+              <div class="field-group">
+                <label for="registerPassword">Password</label>
+                <div class="password-wrap">
+                  <input id="registerPassword" name="password" type="password" autocomplete="new-password" placeholder="Create a password" />
+                  <button type="button" class="toggle-password" aria-label="Show password" data-target="registerPassword">
+                    <span class="icon-eye">👁</span>
+                  </button>
+                </div>
+                <p class="password-hint">Minimum 6 characters + 1 special character</p>
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <div class="field-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="password-wrap">
+                  <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm your password" />
+                  <button type="button" class="toggle-password" aria-label="Show password" data-target="confirmPassword">
+                    <span class="icon-eye">👁</span>
+                  </button>
+                </div>
+                <p class="password-hint">Minimum 6 characters + 1 special character</p>
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+
+              <div class="field-group full-width captcha-group">
+                <label>CAPTCHA</label>
+                <div class="captcha-box" aria-live="polite">
+                  <div id="captchaDisplay" class="captcha-display" aria-label="CAPTCHA code"></div>
+                  <button type="button" id="refreshCaptcha" class="captcha-refresh" aria-label="Refresh CAPTCHA">↻</button>
+                </div>
+                <input id="captchaInput" name="captcha" type="text" placeholder="Enter CAPTCHA" />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+            </div>
+
+            <button type="submit" class="primary-btn">Register</button>
+          </form>
+
+          <div id="registerSuccess" class="success-state hidden" role="alert" aria-live="polite">
+            <p>You are successfully registered!</p>
+            <a href="index.html">Go back to Login</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+  </body>
+</html>
