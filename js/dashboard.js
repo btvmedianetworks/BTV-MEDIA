@@ -2543,7 +2543,7 @@ async function generateVcmFilmstrip(videoUrl, duration) {
   if (!canvas || !videoUrl || !duration || duration <= 0) return;
 
   const rect = canvas.getBoundingClientRect();
-  const width = Math.max(300, Math.floor(rect.width || canvas.parentElement?.clientWidth || 700));
+  const width = Math.max(160, Math.floor(rect.width || canvas.parentElement?.clientWidth || 300));
   const height = Math.max(48, Math.floor(rect.height || 54));
 
   canvas.width = width;
@@ -2639,6 +2639,9 @@ function openVideoCropModal() {
   modal.classList.remove('hidden');
   modal.setAttribute('aria-hidden', 'false');
 
+  const modalBody = document.getElementById('vcmModalBody');
+  if (modalBody) modalBody.scrollTop = 0;
+
   const onLoaded = () => {
     requestAnimationFrame(() => {
       const vW = video.videoWidth || 1920;
@@ -2652,8 +2655,9 @@ function openVideoCropModal() {
       if (resBadge) resBadge.textContent = `${vW}×${vH}`;
       if (durBadge) durBadge.textContent = formatVcmTimecode(dur);
 
-      const maxStageW = Math.min(stageArea ? stageArea.clientWidth - 40 : 640, 680);
-      const maxStageH = 340;
+      const availableAreaW = stageArea ? stageArea.clientWidth : window.innerWidth;
+      const maxStageW = Math.min(Math.max(220, availableAreaW - 28), 680);
+      const maxStageH = window.innerWidth <= 768 ? Math.min(320, Math.round(window.innerHeight * 0.38)) : 340;
       let stageW = maxStageW;
       let stageH = Math.round(stageW * (vH / vW));
 
@@ -3187,6 +3191,54 @@ function setupVideoCropModalHandlers() {
   // Modal backdrop click to close
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeVideoCropModal();
+  });
+
+  // Handle window resize & orientation changes for video crop studio
+  window.addEventListener('resize', () => {
+    if (!modal || modal.classList.contains('hidden') || !vcmState.duration) return;
+    requestAnimationFrame(() => {
+      const stageAreaEl = document.getElementById('vcmStageArea');
+      const stageEl = document.getElementById('vcmStage');
+      const vW = vcmState.rawWidth;
+      const vH = vcmState.rawHeight;
+      if (!vW || !vH || !stageAreaEl || !stageEl) return;
+
+      const availableAreaW = stageAreaEl ? stageAreaEl.clientWidth : window.innerWidth;
+      const maxStageW = Math.min(Math.max(220, availableAreaW - 28), 680);
+      const maxStageH = window.innerWidth <= 768 ? Math.min(320, Math.round(window.innerHeight * 0.38)) : 340;
+      let stageW = maxStageW;
+      let stageH = Math.round(stageW * (vH / vW));
+
+      if (stageH > maxStageH) {
+        stageH = maxStageH;
+        stageW = Math.round(stageH * (vW / vH));
+      }
+
+      const prevW = vcmState.stageW || stageW;
+      const prevH = vcmState.stageH || stageH;
+
+      vcmState.stageW = stageW;
+      vcmState.stageH = stageH;
+
+      stageEl.style.width = `${stageW}px`;
+      stageEl.style.height = `${stageH}px`;
+
+      if (prevW > 0 && prevH > 0 && vcmState.box) {
+        const scaleX = stageW / prevW;
+        const scaleY = stageH / prevH;
+        vcmState.box = {
+          x: Math.round(vcmState.box.x * scaleX),
+          y: Math.round(vcmState.box.y * scaleY),
+          w: Math.max(40, Math.round(vcmState.box.w * scaleX)),
+          h: Math.max(30, Math.round(vcmState.box.h * scaleY))
+        };
+        updateVcmCropBoxDom();
+      }
+
+      if (state.videoUrl) {
+        generateVcmFilmstrip(state.videoUrl, vcmState.duration);
+      }
+    });
   });
 }
 
